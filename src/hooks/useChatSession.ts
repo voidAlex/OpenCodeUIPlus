@@ -66,8 +66,9 @@ interface SubagentListItem {
   parentID: string
   title: string
   agent?: string
-  status: 'running' | 'idle' | 'error'
+  status: 'running' | 'idle' | 'error' | 'pending' | 'completed'
   createdAt: number
+  endedAt?: number
   relatedTask: string
   relatedMessageId?: string
   relatedDescription: string
@@ -715,6 +716,7 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
             messageID: part.messageID,
             agent: part.agent,
             description: part.description,
+            state: part.state, // 透传状态给 UI 收敛
           })),
       )
 
@@ -726,18 +728,34 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
           description: child.title,
         }
 
+      // 核心修复：子会话的权威状态直接继承自父会话中的 part.state.status
+      const authoritativeStatus = related?.state?.status ?? child.status
+
       return {
         ...child,
+        status: authoritativeStatus,
         relatedTask: related.description || related.id,
         relatedMessageId: related.messageID,
         relatedDescription: related.description,
-        elapsedSeconds: Math.max(0, Math.floor((subagentTick - child.createdAt) / 1000)),
+        // 当状态为 completed 或 error 时冻结计时，优先用 store 里的 endedAt，否则用最后一条消息的时间或当前固定时间
+        elapsedSeconds: Math.max(
+          0,
+          Math.floor(
+            ((authoritativeStatus === 'completed' || authoritativeStatus === 'error'
+              ? child.endedAt ?? subagentTick
+              : subagentTick) -
+              child.createdAt) /
+              1000,
+          ),
+        ),
       }
     })
   }, [
     messages,
     routeSessionId,
     subagentTick,
+    subagentPanelContext.isInChildSession,
+    subagentPanelContext.parentSessionId,
     subagentPanelContext.isInChildSession,
     subagentPanelContext.parentSessionId,
   ])

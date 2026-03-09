@@ -242,7 +242,12 @@ export function useGlobalEvents(callbacks?: GlobalEventsCallbacks, directories?:
         // 更新 session meta 供 active tab 使用
         activeSessionStore.setSessionMeta(session.id, session.title, session.directory)
         if (session.parentID) {
-          childSessionStore.registerChildSession(session)
+          const existing = childSessionStore.getSessionInfo(session.id)
+          if (existing) {
+            childSessionStore.updateChildSession(session.id, { title: session.title })
+          } else {
+            childSessionStore.registerChildSession(session)
+          }
         }
       },
 

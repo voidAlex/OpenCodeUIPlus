@@ -3,7 +3,8 @@ import { ReturnIcon, UsersIcon } from '../../components/Icons'
 import { useI18n } from '../../i18n'
 import type { ChildSessionInfo } from '../../store'
 
-export type SubagentInlineItem = ChildSessionInfo & {
+export type SubagentInlineItem = Omit<ChildSessionInfo, 'status'> & {
+  status: 'running' | 'idle' | 'error' | 'pending' | 'completed'
   relatedTask: string
   relatedMessageId?: string
   elapsedSeconds: number
@@ -12,7 +13,7 @@ export type SubagentInlineItem = ChildSessionInfo & {
 interface SubagentListInlineProps {
   items: SubagentInlineItem[]
   onOpenSession: (sessionId: string) => void
-  onJumpToMessage: (messageId: string) => void
+  onJumpToMessage: (messageId: string | undefined) => void
   isInChildSession: boolean
   onBackToParentSession: () => void
   parentSessionTitle?: string
@@ -36,15 +37,16 @@ export const SubagentListInline = memo(function SubagentListInline({
   const rows = useMemo(
     () =>
       items.map(item => {
-        const status =
-          item.status === 'running'
+        const s = item.status
+        const statusText =
+          s === 'running' || s === 'pending'
             ? t('subagentRunning')
-            : item.status === 'idle'
+            : s === 'idle' || s === 'completed'
               ? t('subagentDone')
               : t('subagentError')
         return {
           ...item,
-          status,
+          statusText,
         }
       }),
     [items, t],
@@ -77,13 +79,14 @@ export const SubagentListInline = memo(function SubagentListInline({
                     {item.agent || item.title || item.id.slice(0, 8)}
                   </div>
                   <div className="text-[11px] text-text-400 mt-0.5 truncate">
-                    {item.status} · {item.elapsedSeconds}s
+                    {item.statusText} · {item.elapsedSeconds}s
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     className="px-2 py-1 text-[11px] rounded border border-border-200/60 hover:bg-bg-200/60 text-text-300"
-                    onClick={() => onJumpToMessage(item.relatedMessageId || item.relatedTask)}
+                    onClick={() => onJumpToMessage(item.relatedMessageId)}
+                    disabled={!item.relatedMessageId}
                   >
                     {t('jumpToMessage')}
                   </button>

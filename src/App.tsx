@@ -280,26 +280,29 @@ function App() {
     if (!subagentPanelContext.parentSessionId) return
     if (routeSessionId !== subagentPanelContext.parentSessionId) return
 
-    let attempts = 0
-    const maxAttempts = 8
-    const run = () => {
+    // 当路由切换到父会话且消息加载完成后，执行滚动
+    if (loadState === 'loaded') {
       const ok = chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
       if (ok) {
         setPendingSubagentJumpMessageId(null)
-        return
+      } else {
+        // 如果 loaded 状态下还没找到，可能是 virtualized list 还没把 sourceIds 合并进去，容错重试几次
+        let attempts = 0
+        const maxAttempts = 10
+        const run = () => {
+          const success = chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
+          if (success || attempts >= maxAttempts) {
+            setPendingSubagentJumpMessageId(null)
+            return
+          }
+          attempts++
+          timer = window.setTimeout(run, 150)
+        }
+        let timer = window.setTimeout(run, 100)
+        return () => window.clearTimeout(timer)
       }
-      attempts += 1
-      if (attempts >= maxAttempts) {
-        setPendingSubagentJumpMessageId(null)
-        return
-      }
-      timer = window.setTimeout(run, 120)
     }
-
-    let timer = window.setTimeout(run, 80)
-
-    return () => window.clearTimeout(timer)
-  }, [pendingSubagentJumpMessageId, routeSessionId, subagentPanelContext.parentSessionId])
+  }, [pendingSubagentJumpMessageId, routeSessionId, subagentPanelContext.parentSessionId, loadState])
 
   // 赋值 ref（需在 useChatSession 之后，因为 handleVisibleMessageIdsChange 来自该 hook）
   handleVisibleMessageIdsChangeRef.current = handleVisibleMessageIdsChange
@@ -918,6 +921,7 @@ function App() {
               items={subagentList}
               onOpenSession={handleOpenSessionById}
               onJumpToMessage={messageId => {
+                if (!messageId) return
                 if (subagentPanelContext.isInChildSession) {
                   setPendingSubagentJumpMessageId(messageId)
                   handleBackToParentSession()

@@ -259,6 +259,7 @@ export interface SubtaskPart extends PartBase {
   agent: string
   model?: ModelRef
   command?: string
+  state?: { status: 'pending' | 'running' | 'completed' | 'error' } // OpenCode 会在此回填最终状态
 }
 
 export interface SnapshotPart extends PartBase {

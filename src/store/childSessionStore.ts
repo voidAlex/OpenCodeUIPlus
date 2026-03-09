@@ -20,6 +20,7 @@ export interface ChildSessionInfo {
   agent?: string // 子 agent 名称
   status: 'running' | 'idle' | 'error'
   createdAt: number
+  endedAt?: number
 }
 
 type Subscriber = () => void
@@ -58,6 +59,18 @@ class ChildSessionStore {
   registerChildSession(session: ApiSession) {
     if (!session.parentID) return // 不是子 session
 
+    const existing = this.sessionInfo.get(session.id)
+
+    if (existing) {
+      existing.parentID = session.parentID
+      existing.title = session.title || existing.title
+      if (!existing.createdAt) {
+        existing.createdAt = session.time.created
+      }
+      this.notify()
+      return
+    }
+
     // 添加到 parent -> children 映射
     let children = this.childrenByParent.get(session.parentID)
     if (!children) {
@@ -93,14 +106,22 @@ class ChildSessionStore {
    * 标记子 session 为 idle
    */
   markIdle(sessionId: string) {
-    this.updateChildSession(sessionId, { status: 'idle' })
+    const info = this.sessionInfo.get(sessionId)
+    if (!info) return
+    info.status = 'idle'
+    info.endedAt ??= Date.now()
+    this.notify()
   }
 
   /**
    * 标记子 session 为 error
    */
   markError(sessionId: string) {
-    this.updateChildSession(sessionId, { status: 'error' })
+    const info = this.sessionInfo.get(sessionId)
+    if (!info) return
+    info.status = 'error'
+    info.endedAt ??= Date.now()
+    this.notify()
   }
 
   // ============================================
