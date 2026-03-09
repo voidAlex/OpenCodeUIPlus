@@ -3,7 +3,7 @@ import { STORAGE_KEY_UI_LANGUAGE } from '../constants/storage'
 
 export type UILanguage = 'zh' | 'en'
 
-type TranslationKey =
+export type TranslationKey =
   | 'appName'
   | 'waiting'
   | 'waitingQueue'
@@ -130,6 +130,153 @@ type TranslationKey =
   | 'cacheRW'
   | 'rawMessages'
   | 'lastMessage'
+  | 'close'
+  | 'themePresets'
+  | 'themePresetsDesc'
+  | 'customCss'
+  | 'customCssDesc'
+  | 'display'
+  | 'displayDesc'
+  | 'colorMode'
+  | 'auto'
+  | 'light'
+  | 'dark'
+  | 'wideModeDesc'
+  | 'languageDesc'
+  | 'pathsFormatting'
+  | 'pathsFormattingDesc'
+  | 'agentBehavior'
+  | 'agentBehaviorDesc'
+  | 'autoApprove'
+  | 'autoApproveDesc'
+  | 'sidebarRecents'
+  | 'sidebarRecentsDesc'
+  | 'folderStyleRecents'
+  | 'folderStyleRecentsDesc'
+  | 'conversationExperience'
+  | 'conversationExperienceDesc'
+  | 'collapseLongMessages'
+  | 'collapseLongMessagesDesc'
+  | 'thinkingDisplay'
+  | 'thinkingDisplayDesc'
+  | 'capsule'
+  | 'italic'
+  | 'stepFinishInfo'
+  | 'tokens'
+  | 'cache'
+  | 'cost'
+  | 'duration'
+  | 'totalDuration'
+  | 'showTokenUsage'
+  | 'showCacheHitInfo'
+  | 'showApiCost'
+  | 'showMessageResponseTime'
+  | 'showFullTurnElapsedTime'
+  | 'systemNotifications'
+  | 'systemNotificationsDesc'
+  | 'notificationsLabel'
+  | 'blockedByBrowser'
+  | 'notifyWhenAiCompletes'
+  | 'testNotification'
+  | 'testNotificationDesc'
+  | 'enableNotificationsToTest'
+  | 'send'
+  | 'systemNotificationsUnavailable'
+  | 'inAppAlerts'
+  | 'inAppAlertsDesc'
+  | 'toastNotifications'
+  | 'toastNotificationsDesc'
+  | 'localService'
+  | 'localServiceDesc'
+  | 'binaryPath'
+  | 'binaryPathPlaceholder'
+  | 'binaryPathHint'
+  | 'autoStartService'
+  | 'autoStartServiceDesc'
+  | 'serviceStatus'
+  | 'startingOpencodeService'
+  | 'runningStartedByApp'
+  | 'runningExternal'
+  | 'notRunning'
+  | 'start'
+  | 'stop'
+  | 'refresh'
+  | 'environmentVariables'
+  | 'envVarsDesc'
+  | 'desktopOnlyServiceDesc'
+  | 'checkHealth'
+  | 'checking'
+  | 'invalidCredentials'
+  | 'offline'
+  | 'unknown'
+  | 'name'
+  | 'url'
+  | 'username'
+  | 'password'
+  | 'nameRequired'
+  | 'urlRequired'
+  | 'invalidUrl'
+  | 'myServer'
+  | 'serverUrlPlaceholder'
+  | 'opencodeDefault'
+  | 'hideAuthentication'
+  | 'addAuthentication'
+  | 'crossOriginPasswordWarning'
+  | 'credentialsStoredHint'
+  | 'connections'
+  | 'connectionsDesc'
+  | 'noServersConfigured'
+  | 'tabServers'
+  | 'tabServersDesc'
+  | 'tabChat'
+  | 'tabChatDesc'
+  | 'tabAppearance'
+  | 'tabAppearanceDesc'
+  | 'tabNotifications'
+  | 'tabNotificationsDesc'
+  | 'tabService'
+  | 'tabServiceDesc'
+  | 'tabShortcuts'
+  | 'tabShortcutsDesc'
+  | 'core'
+  | 'advanced'
+  | 'customizeUiBehaviorServerSetup'
+  | 'closeSettings'
+  | 'awaitingPermission'
+  | 'awaitingAnswer'
+  | 'retrying'
+  | 'working'
+  | 'completed'
+  | 'error'
+  | 'permission'
+  | 'noProjectFoldersYet'
+  | 'addProjectBrowseHint'
+  | 'deleteChat'
+  | 'deleteChatConfirm'
+  | 'delete'
+  | 'moveFolderUp'
+  | 'moveFolderDown'
+  | 'noChatsInFolder'
+  | 'loadingMore'
+  | 'showMoreChats'
+  | 'keyboardShortcuts'
+  | 'resetAll'
+  | 'resetToDefault'
+  | 'filter'
+  | 'noMatches'
+  | 'shortcutRebindHelp'
+  | 'add'
+  | 'online'
+  | 'openCodeWebModeHint'
+  | 'pathStyleAuto'
+  | 'pathStyleUnix'
+  | 'pathStyleWindows'
+  | 'general'
+  | 'terminal'
+  | 'using'
+  | 'detected'
+  | 'windows'
+  | 'unix'
 
 type Translator = Record<TranslationKey, string>
 
@@ -261,6 +408,155 @@ const dictionaries: Record<UILanguage, Translator> = {
     cacheRW: 'Cache (r/w)',
     rawMessages: 'Raw Messages',
     lastMessage: 'last: {id}',
+    close: 'Close',
+    themePresets: 'Theme Presets',
+    themePresetsDesc: 'Choose a base visual style for the app',
+    customCss: 'Custom CSS',
+    customCssDesc: 'Override fonts, colors, and any CSS variables. Works with all themes.',
+    display: 'Display',
+    displayDesc: 'Control color mode and layout',
+    colorMode: 'Color Mode',
+    auto: 'Auto',
+    light: 'Light',
+    dark: 'Dark',
+    wideModeDesc: 'Expand chat area for long outputs',
+    languageDesc: 'Switch UI language instantly and persist preference',
+    pathsFormatting: 'Paths & Formatting',
+    pathsFormattingDesc: 'How file paths are displayed in messages and tools',
+    agentBehavior: 'Agent Behavior',
+    agentBehaviorDesc: 'Execution defaults for tool actions',
+    autoApprove: 'Auto-Approve',
+    autoApproveDesc: 'Use local rules for always, send once to server',
+    sidebarRecents: 'Sidebar Recents',
+    sidebarRecentsDesc: 'Optional folder view for recent chats',
+    folderStyleRecents: 'Folder-Style Recents',
+    folderStyleRecentsDesc: 'Group recent chats by project folder while keeping the default list available',
+    conversationExperience: 'Conversation Experience',
+    conversationExperienceDesc: 'Message density, reasoning style, and step summary fields',
+    collapseLongMessages: 'Collapse Long Messages',
+    collapseLongMessagesDesc: 'Auto-collapse lengthy user messages',
+    thinkingDisplay: 'Thinking Display',
+    thinkingDisplayDesc: 'Choose capsule or low-noise italic style',
+    capsule: 'Capsule',
+    italic: 'Italic',
+    stepFinishInfo: 'Step Finish Info',
+    tokens: 'Tokens',
+    cache: 'Cache',
+    cost: 'Cost',
+    duration: 'Duration',
+    totalDuration: 'Total Duration',
+    showTokenUsage: 'Show token usage',
+    showCacheHitInfo: 'Show cache hit info',
+    showApiCost: 'Show API cost',
+    showMessageResponseTime: 'Show message response time',
+    showFullTurnElapsedTime: 'Show full turn elapsed time',
+    systemNotifications: 'System Notifications',
+    systemNotificationsDesc: 'Browser-level notifications when responses complete',
+    notificationsLabel: 'Notifications',
+    blockedByBrowser: 'Blocked by browser',
+    notifyWhenAiCompletes: 'Notify when AI completes a response',
+    testNotification: 'Test Notification',
+    testNotificationDesc: 'Send a sample notification',
+    enableNotificationsToTest: 'Enable notifications to test',
+    send: 'Send',
+    systemNotificationsUnavailable: 'System notifications are not available in this environment',
+    inAppAlerts: 'In-App Alerts',
+    inAppAlertsDesc: 'Toast notifications for background session events',
+    toastNotifications: 'Toast Notifications',
+    toastNotificationsDesc: 'Show in-app toast popups',
+    localService: 'Local Service',
+    localServiceDesc: 'Manage embedded opencode serve startup, status, and environment',
+    binaryPath: 'Binary Path',
+    binaryPathPlaceholder: 'opencode (default, uses PATH)',
+    binaryPathHint: 'Leave empty to use opencode from PATH. Or enter full path, e.g. /usr/local/bin/opencode',
+    autoStartService: 'Auto-start Service',
+    autoStartServiceDesc: 'Run opencode serve automatically when app launches',
+    serviceStatus: 'Service Status',
+    startingOpencodeService: 'Starting opencode serve...',
+    runningStartedByApp: 'Running (started by app)',
+    runningExternal: 'Running (external)',
+    notRunning: 'Not running',
+    start: 'Start',
+    stop: 'Stop',
+    refresh: 'Refresh',
+    environmentVariables: 'Environment Variables',
+    envVarsDesc: 'Passed to the opencode serve process (e.g. HTTPS_PROXY, API keys)',
+    desktopOnlyServiceDesc: 'This section is available on desktop app only',
+    checkHealth: 'Check health',
+    checking: 'Checking...',
+    invalidCredentials: 'Invalid credentials',
+    offline: 'Offline',
+    unknown: 'Unknown',
+    name: 'Name',
+    url: 'URL',
+    username: 'Username',
+    password: 'Password',
+    nameRequired: 'Name required',
+    urlRequired: 'URL required',
+    invalidUrl: 'Invalid URL',
+    myServer: 'My Server',
+    serverUrlPlaceholder: 'http://192.168.1.100:4096',
+    opencodeDefault: 'opencode (default)',
+    hideAuthentication: 'Hide authentication',
+    addAuthentication: 'Add authentication',
+    crossOriginPasswordWarning: 'Cross-origin + password may not work due to a backend CORS limitation',
+    credentialsStoredHint:
+      'Credentials are stored in localStorage. For same-origin setups, the browser can handle auth natively without entering credentials here.',
+    connections: 'Connections',
+    connectionsDesc: 'Manage backend endpoints and choose which server this session uses',
+    noServersConfigured: 'No servers configured',
+    tabServers: 'Servers',
+    tabServersDesc: 'Backend connections and fast active endpoint switching',
+    tabChat: 'Chat',
+    tabChatDesc: 'Reasoning style, path display, and conversation behavior',
+    tabAppearance: 'Appearance',
+    tabAppearanceDesc: 'Theme, color mode, and layout preferences',
+    tabNotifications: 'Notifications',
+    tabNotificationsDesc: 'Desktop and in-app alerts',
+    tabService: 'Service',
+    tabServiceDesc: 'Local opencode service management',
+    tabShortcuts: 'Shortcuts',
+    tabShortcutsDesc: 'Customize keyboard shortcuts for faster workflows',
+    core: 'Core',
+    advanced: 'Advanced',
+    customizeUiBehaviorServerSetup: 'Customize UI, behavior, and server setup',
+    closeSettings: 'Close settings',
+    awaitingPermission: 'Awaiting Permission',
+    awaitingAnswer: 'Awaiting Answer',
+    retrying: 'Retrying',
+    working: 'Working',
+    completed: 'Completed',
+    error: 'Error',
+    permission: 'Permission',
+    noProjectFoldersYet: 'No project folders yet',
+    addProjectBrowseHint: 'Add a project to browse recent chats by folder.',
+    deleteChat: 'Delete Chat',
+    deleteChatConfirm: 'Are you sure you want to delete this chat? This action cannot be undone.',
+    delete: 'Delete',
+    moveFolderUp: 'Move folder up',
+    moveFolderDown: 'Move folder down',
+    noChatsInFolder: 'No chats in this folder',
+    loadingMore: 'Loading more...',
+    showMoreChats: 'Show more chats',
+    keyboardShortcuts: 'Keyboard Shortcuts',
+    resetAll: 'Reset all',
+    resetToDefault: 'Reset to default',
+    filter: 'Filter...',
+    noMatches: 'No matches',
+    shortcutRebindHelp: 'Click a shortcut to rebind. Enter confirm, Esc cancel.',
+    add: 'Add',
+    online: 'Online',
+    openCodeWebModeHint:
+      'OpenCode web mode connects to external servers and does not manage a local background service',
+    pathStyleAuto: 'Auto',
+    pathStyleUnix: 'Unix /',
+    pathStyleWindows: 'Win \\',
+    general: 'General',
+    terminal: 'Terminal',
+    using: 'Using',
+    detected: 'detected',
+    windows: 'Windows',
+    unix: 'Unix',
   },
   zh: {
     appName: 'OpenCodeUIPlus',
@@ -389,6 +685,153 @@ const dictionaries: Record<UILanguage, Translator> = {
     cacheRW: '缓存（读/写）',
     rawMessages: '原始消息',
     lastMessage: '最后消息：{id}',
+    close: '关闭',
+    themePresets: '主题预设',
+    themePresetsDesc: '为应用选择基础视觉风格',
+    customCss: '自定义 CSS',
+    customCssDesc: '覆盖字体、颜色和 CSS 变量，适配所有主题',
+    display: '显示',
+    displayDesc: '控制颜色模式和布局',
+    colorMode: '颜色模式',
+    auto: '自动',
+    light: '浅色',
+    dark: '深色',
+    wideModeDesc: '为长输出扩展聊天区域宽度',
+    languageDesc: '即时切换界面语言并持久化偏好',
+    pathsFormatting: '路径与格式',
+    pathsFormattingDesc: '控制消息和工具中的路径显示方式',
+    agentBehavior: 'Agent 行为',
+    agentBehaviorDesc: '工具操作的执行默认项',
+    autoApprove: '自动批准',
+    autoApproveDesc: '本地规则处理 always，向服务端发送 once',
+    sidebarRecents: '侧边栏最近会话',
+    sidebarRecentsDesc: '为最近会话启用可选文件夹视图',
+    folderStyleRecents: '文件夹式最近会话',
+    folderStyleRecentsDesc: '按项目文件夹分组最近会话，同时保留默认列表',
+    conversationExperience: '会话体验',
+    conversationExperienceDesc: '消息密度、推理样式和步骤摘要字段',
+    collapseLongMessages: '折叠长消息',
+    collapseLongMessagesDesc: '自动折叠较长的用户消息',
+    thinkingDisplay: '思考展示',
+    thinkingDisplayDesc: '选择胶囊或低噪音斜体样式',
+    capsule: '胶囊',
+    italic: '斜体',
+    stepFinishInfo: '步骤完成信息',
+    tokens: 'Token',
+    cache: '缓存',
+    cost: '费用',
+    duration: '时长',
+    totalDuration: '总时长',
+    showTokenUsage: '显示 Token 使用',
+    showCacheHitInfo: '显示缓存命中信息',
+    showApiCost: '显示 API 费用',
+    showMessageResponseTime: '显示消息响应时间',
+    showFullTurnElapsedTime: '显示整轮耗时',
+    systemNotifications: '系统通知',
+    systemNotificationsDesc: '响应完成后触发浏览器级通知',
+    notificationsLabel: '通知',
+    blockedByBrowser: '已被浏览器阻止',
+    notifyWhenAiCompletes: 'AI 响应完成时通知',
+    testNotification: '测试通知',
+    testNotificationDesc: '发送一条示例通知',
+    enableNotificationsToTest: '请先启用通知再测试',
+    send: '发送',
+    systemNotificationsUnavailable: '当前环境不支持系统通知',
+    inAppAlerts: '应用内提醒',
+    inAppAlertsDesc: '后台会话事件的 Toast 通知',
+    toastNotifications: 'Toast 通知',
+    toastNotificationsDesc: '显示应用内浮动提示',
+    localService: '本地服务',
+    localServiceDesc: '管理内置 opencode serve 的启动、状态与环境',
+    binaryPath: '二进制路径',
+    binaryPathPlaceholder: 'opencode（默认，使用 PATH）',
+    binaryPathHint: '留空将使用 PATH 中的 opencode。也可输入完整路径，例如 /usr/local/bin/opencode',
+    autoStartService: '自动启动服务',
+    autoStartServiceDesc: '应用启动时自动运行 opencode serve',
+    serviceStatus: '服务状态',
+    startingOpencodeService: '正在启动 opencode serve...',
+    runningStartedByApp: '运行中（由应用启动）',
+    runningExternal: '运行中（外部启动）',
+    notRunning: '未运行',
+    start: '启动',
+    stop: '停止',
+    refresh: '刷新',
+    environmentVariables: '环境变量',
+    envVarsDesc: '传递给 opencode serve 进程（如 HTTPS_PROXY、API key）',
+    desktopOnlyServiceDesc: '该部分仅在桌面端可用',
+    checkHealth: '检查健康状态',
+    checking: '检查中...',
+    invalidCredentials: '凭据无效',
+    offline: '离线',
+    unknown: '未知',
+    name: '名称',
+    url: 'URL',
+    username: '用户名',
+    password: '密码',
+    nameRequired: '名称必填',
+    urlRequired: 'URL 必填',
+    invalidUrl: 'URL 无效',
+    myServer: '我的服务',
+    serverUrlPlaceholder: 'http://192.168.1.100:4096',
+    opencodeDefault: 'opencode（默认）',
+    hideAuthentication: '隐藏认证',
+    addAuthentication: '添加认证',
+    crossOriginPasswordWarning: '跨域 + 密码可能因后端 CORS 限制无法使用',
+    credentialsStoredHint: '凭据保存在 localStorage。对于同源部署，浏览器通常可原生处理认证，无需在此填写。',
+    connections: '连接',
+    connectionsDesc: '管理后端端点并选择当前会话使用的服务',
+    noServersConfigured: '尚未配置服务',
+    tabServers: '服务',
+    tabServersDesc: '后端连接与快速切换当前端点',
+    tabChat: '聊天',
+    tabChatDesc: '推理样式、路径显示与会话行为',
+    tabAppearance: '外观',
+    tabAppearanceDesc: '主题、颜色模式与布局偏好',
+    tabNotifications: '通知',
+    tabNotificationsDesc: '桌面与应用内提醒',
+    tabService: '服务',
+    tabServiceDesc: '本地 opencode 服务管理',
+    tabShortcuts: '快捷键',
+    tabShortcutsDesc: '自定义快捷键以提升效率',
+    core: '核心',
+    advanced: '高级',
+    customizeUiBehaviorServerSetup: '自定义界面、行为与服务配置',
+    closeSettings: '关闭设置',
+    awaitingPermission: '等待权限',
+    awaitingAnswer: '等待回答',
+    retrying: '重试中',
+    working: '执行中',
+    completed: '完成',
+    error: '错误',
+    permission: '权限',
+    noProjectFoldersYet: '暂无项目文件夹',
+    addProjectBrowseHint: '添加项目后可按文件夹浏览最近会话。',
+    deleteChat: '删除会话',
+    deleteChatConfirm: '确定删除该会话吗？该操作不可撤销。',
+    delete: '删除',
+    moveFolderUp: '上移文件夹',
+    moveFolderDown: '下移文件夹',
+    noChatsInFolder: '此文件夹暂无会话',
+    loadingMore: '加载更多中...',
+    showMoreChats: '显示更多会话',
+    keyboardShortcuts: '键盘快捷键',
+    resetAll: '全部重置',
+    resetToDefault: '恢复默认',
+    filter: '筛选...',
+    noMatches: '无匹配项',
+    shortcutRebindHelp: '点击快捷键可重新绑定。Enter 确认，Esc 取消。',
+    add: '添加',
+    online: '在线',
+    openCodeWebModeHint: 'OpenCode 网页模式连接外部服务，不管理本地后台服务',
+    pathStyleAuto: '自动',
+    pathStyleUnix: 'Unix /',
+    pathStyleWindows: 'Win \\',
+    general: '通用',
+    terminal: '终端',
+    using: '使用',
+    detected: '检测到',
+    windows: 'Windows',
+    unix: 'Unix',
   },
 }
 

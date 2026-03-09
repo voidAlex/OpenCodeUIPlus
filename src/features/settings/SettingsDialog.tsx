@@ -39,9 +39,11 @@ import { KeybindingsSection } from './KeybindingsSection'
 import type { ThemeMode } from '../../hooks'
 import type { PathMode } from '../../utils/directoryUtils'
 import type { ServerConfig, ServerHealth } from '../../store/serverStore'
-import { useI18n, type UILanguage } from '../../i18n'
+import { useI18n, type UILanguage, type TranslationKey } from '../../i18n'
 
 const APP_VERSION_LABEL = `OpenCodeUIPlus v${__APP_VERSION__}`
+
+const translation = (key: string) => key as TranslationKey
 
 // ============================================
 // Types
@@ -507,10 +509,11 @@ function AppearanceSettings({
   customCSS?: string
   onCustomCSSChange?: (css: string) => void
 }) {
+  const { t } = useI18n()
   return (
     <div className="space-y-4">
       {availablePresets && availablePresets.length > 0 && (
-        <SettingsCard title="Theme Presets" description="Choose a base visual style for the app">
+        <SettingsCard title={t('themePresets')} description={t('themePresetsDesc')}>
           <div className="grid gap-2 sm:grid-cols-2">
             {availablePresets.map(p => (
               <PresetCard
@@ -527,24 +530,23 @@ function AppearanceSettings({
       )}
 
       {onCustomCSSChange && (
-        <SettingsCard
-          title="Custom CSS"
-          description="Override fonts, colors, and any CSS variables. Works with all themes."
-        >
+        <SettingsCard title={t('customCss')} description={t('customCssDesc')}>
           <CustomCSSEditor value={customCSS || ''} onChange={onCustomCSSChange} />
         </SettingsCard>
       )}
 
-      <SettingsCard title="Display" description="Control color mode and layout">
+      <SettingsCard title={t('display')} description={t('displayDesc')}>
         <div className="space-y-4">
           <div>
-            <div className="text-[11px] font-medium text-text-400 uppercase tracking-wider mb-1.5">Color Mode</div>
+            <div className="text-[11px] font-medium text-text-400 uppercase tracking-wider mb-1.5">
+              {t('colorMode')}
+            </div>
             <SegmentedControl
               value={themeMode}
               options={[
-                { value: 'system', label: 'Auto', icon: <SystemIcon size={14} /> },
-                { value: 'light', label: 'Light', icon: <SunIcon size={14} /> },
-                { value: 'dark', label: 'Dark', icon: <MoonIcon size={14} /> },
+                { value: 'system', label: t('auto'), icon: <SystemIcon size={14} /> },
+                { value: 'light', label: t('light'), icon: <SunIcon size={14} /> },
+                { value: 'dark', label: t('dark'), icon: <MoonIcon size={14} /> },
               ]}
               onChange={(v, e) => onThemeChange(v, e)}
             />
@@ -553,8 +555,8 @@ function AppearanceSettings({
           {onToggleWideMode && (
             <div className="pt-3 border-t border-border-100/55">
               <SettingRow
-                label="Wide Mode"
-                description="Expand chat area for long outputs"
+                label={t('wideMode')}
+                description={t('wideModeDesc')}
                 icon={isWideMode ? <MinimizeIcon size={14} /> : <MaximizeIcon size={14} />}
                 onClick={onToggleWideMode}
               >
@@ -715,7 +717,7 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
     <div className="space-y-4">
       {mode === 'chat' && (
         <>
-          <SettingsCard title={t('language')} description="Switch UI language instantly and persist preference">
+          <SettingsCard title={t('language')} description={t('languageDesc')}>
             <SegmentedControl
               value={language}
               options={[
@@ -727,24 +729,25 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
           </SettingsCard>
 
           <div className="grid gap-4 xl:grid-cols-2">
-            <SettingsCard title="Paths & Formatting" description="How file paths are displayed in messages and tools">
+            <SettingsCard title={t('pathsFormatting')} description={t('pathsFormattingDesc')}>
               <SegmentedControl
                 value={pathMode}
                 options={[
-                  { value: 'auto', label: 'Auto', icon: <PathAutoIcon size={14} /> },
-                  { value: 'unix', label: 'Unix /', icon: <PathUnixIcon size={14} /> },
-                  { value: 'windows', label: 'Win \\', icon: <PathWindowsIcon size={14} /> },
+                  { value: 'auto', label: t('pathStyleAuto'), icon: <PathAutoIcon size={14} /> },
+                  { value: 'unix', label: t('pathStyleUnix'), icon: <PathUnixIcon size={14} /> },
+                  { value: 'windows', label: t('pathStyleWindows'), icon: <PathWindowsIcon size={14} /> },
                 ]}
                 onChange={v => setPathMode(v as PathMode)}
               />
               {isAutoMode && (
                 <div className="text-[11px] text-text-400 mt-2 px-1">
-                  Using <span className="font-mono text-text-300">{effectiveStyle === 'windows' ? '\\' : '/'}</span>
+                  {t('using')}{' '}
+                  <span className="font-mono text-text-300">{effectiveStyle === 'windows' ? '\\' : '/'}</span>
                   {detectedStyle && (
                     <>
-                      , detected{' '}
+                      , {t('detected')}{' '}
                       <span className="font-mono text-text-300">
-                        {detectedStyle === 'windows' ? 'Windows' : 'Unix'}
+                        {detectedStyle === 'windows' ? t('windows') : t('unix')}
                       </span>
                     </>
                   )}
@@ -752,10 +755,10 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
               )}
             </SettingsCard>
 
-            <SettingsCard title="Agent Behavior" description="Execution defaults for tool actions">
+            <SettingsCard title={t('agentBehavior')} description={t('agentBehaviorDesc')}>
               <SettingRow
-                label="Auto-Approve"
-                description="Use local rules for always, send once to server"
+                label={t('autoApprove')}
+                description={t('autoApproveDesc')}
                 icon={<BoltIcon size={14} />}
                 onClick={handleAutoApprove}
               >
@@ -763,10 +766,10 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
               </SettingRow>
             </SettingsCard>
 
-            <SettingsCard title="Sidebar Recents" description="Optional folder view for recent chats">
+            <SettingsCard title={t('sidebarRecents')} description={t('sidebarRecentsDesc')}>
               <SettingRow
-                label="Folder-Style Recents"
-                description="Group recent chats by project folder while keeping the default list available"
+                label={t('folderStyleRecents')}
+                description={t('folderStyleRecentsDesc')}
                 icon={<FolderIcon size={14} />}
                 onClick={handleSidebarFolderRecentsToggle}
               >
@@ -775,15 +778,12 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
             </SettingsCard>
           </div>
 
-          <SettingsCard
-            title="Conversation Experience"
-            description="Message density, reasoning style, and step summary fields"
-          >
+          <SettingsCard title={t('conversationExperience')} description={t('conversationExperienceDesc')}>
             <div className="space-y-3">
               <div className="grid gap-2 lg:grid-cols-2">
                 <SettingRow
-                  label="Collapse Long Messages"
-                  description="Auto-collapse lengthy user messages"
+                  label={t('collapseLongMessages')}
+                  description={t('collapseLongMessagesDesc')}
                   icon={<CompactIcon size={14} />}
                   onClick={handleCollapseToggle}
                   className="bg-bg-100/35 border-border-200/45"
@@ -797,15 +797,13 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                       <ThinkingIcon size={14} />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="text-[13px] font-medium text-text-100">Thinking Display</div>
-                      <div className="text-[11px] text-text-400 mt-0.5 mb-2">
-                        Choose capsule or low-noise italic style
-                      </div>
+                      <div className="text-[13px] font-medium text-text-100">{t('thinkingDisplay')}</div>
+                      <div className="text-[11px] text-text-400 mt-0.5 mb-2">{t('thinkingDisplayDesc')}</div>
                       <SegmentedControl
                         value={reasoningDisplayMode}
                         options={[
-                          { value: 'capsule', label: 'Capsule' },
-                          { value: 'italic', label: 'Italic' },
+                          { value: 'capsule', label: t('capsule') },
+                          { value: 'italic', label: t('italic') },
                         ]}
                         onChange={v => handleReasoningDisplayModeChange(v as ReasoningDisplayMode)}
                       />
@@ -816,16 +814,16 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
 
               <div className="pt-3 border-t border-border-100/55">
                 <div className="text-[11px] font-medium text-text-400 uppercase tracking-wider mb-2">
-                  Step Finish Info
+                  {t('stepFinishInfo')}
                 </div>
                 <div className="grid gap-2 md:grid-cols-2">
                   {(
                     [
-                      { key: 'tokens', label: 'Tokens', desc: 'Show token usage' },
-                      { key: 'cache', label: 'Cache', desc: 'Show cache hit info' },
-                      { key: 'cost', label: 'Cost', desc: 'Show API cost' },
-                      { key: 'duration', label: 'Duration', desc: 'Show message response time' },
-                      { key: 'turnDuration', label: 'Total Duration', desc: 'Show full turn elapsed time' },
+                      { key: 'tokens', label: t('tokens'), desc: t('showTokenUsage') },
+                      { key: 'cache', label: t('cache'), desc: t('showCacheHitInfo') },
+                      { key: 'cost', label: t('cost'), desc: t('showApiCost') },
+                      { key: 'duration', label: t('duration'), desc: t('showMessageResponseTime') },
+                      { key: 'turnDuration', label: t('totalDuration'), desc: t('showFullTurnElapsedTime') },
                     ] as const
                   ).map(({ key, label, desc }) => (
                     <SettingRow
@@ -859,14 +857,12 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
 
       {mode === 'notifications' && (
         <div className="grid gap-4 xl:grid-cols-2">
-          <SettingsCard title="System Notifications" description="Browser-level notifications when responses complete">
+          <SettingsCard title={t('systemNotifications')} description={t('systemNotificationsDesc')}>
             {notificationsSupported ? (
               <div className="space-y-1.5">
                 <SettingRow
-                  label="Notifications"
-                  description={
-                    notificationPermission === 'denied' ? 'Blocked by browser' : 'Notify when AI completes a response'
-                  }
+                  label={t('notificationsLabel')}
+                  description={notificationPermission === 'denied' ? t('blockedByBrowser') : t('notifyWhenAiCompletes')}
                   icon={<BellIcon size={14} />}
                   onClick={() => notificationPermission !== 'denied' && setNotificationsEnabled(!notificationsEnabled)}
                 >
@@ -879,8 +875,8 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                 </SettingRow>
 
                 <SettingRow
-                  label="Test Notification"
-                  description={notificationsEnabled ? 'Send a sample notification' : 'Enable notifications to test'}
+                  label={t('testNotification')}
+                  description={notificationsEnabled ? t('testNotificationDesc') : t('enableNotificationsToTest')}
                   icon={<BellIcon size={14} />}
                 >
                   <Button
@@ -889,21 +885,19 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                     onClick={handleTestNotification}
                     disabled={!notificationsEnabled || notificationPermission === 'denied'}
                   >
-                    Send
+                    {t('send')}
                   </Button>
                 </SettingRow>
               </div>
             ) : (
-              <div className="text-[12px] text-text-400 leading-relaxed">
-                System notifications are not available in this environment
-              </div>
+              <div className="text-[12px] text-text-400 leading-relaxed">{t('systemNotificationsUnavailable')}</div>
             )}
           </SettingsCard>
 
-          <SettingsCard title="In-App Alerts" description="Toast notifications for background session events">
+          <SettingsCard title={t('inAppAlerts')} description={t('inAppAlertsDesc')}>
             <SettingRow
-              label="Toast Notifications"
-              description="Show in-app toast popups"
+              label={t('toastNotifications')}
+              description={t('toastNotificationsDesc')}
               icon={<BellIcon size={14} />}
               onClick={handleToastToggle}
             >
@@ -915,33 +909,25 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
 
       {mode === 'service' &&
         (isTauriDesktop ? (
-          <SettingsCard
-            title="Local Service"
-            description="Manage embedded opencode serve startup, status, and environment"
-          >
+          <SettingsCard title={t('localService')} description={t('localServiceDesc')}>
             <div className="space-y-3">
               <div>
-                <div className="text-[11px] font-medium text-text-300 mb-1">Binary Path</div>
+                <div className="text-[11px] font-medium text-text-300 mb-1">{t('binaryPath')}</div>
                 <input
                   type="text"
                   value={localBinaryPath}
                   onChange={e => handleBinaryPathChange(e.target.value)}
-                  placeholder="opencode (default, uses PATH)"
+                  placeholder={t('binaryPathPlaceholder')}
                   className="w-full h-8 px-3 text-[13px] font-mono bg-bg-200/50 border border-border-200 rounded-md
                     focus:outline-none focus:border-accent-main-100/50 text-text-100 placeholder:text-text-400"
                 />
-                <div className="text-[11px] text-text-400 mt-1">
-                  Leave empty to use{' '}
-                  <code className="text-[10px] px-1 py-0.5 bg-bg-200 rounded font-mono">opencode</code> from PATH. Or
-                  enter full path, e.g.{' '}
-                  <code className="text-[10px] px-1 py-0.5 bg-bg-200 rounded font-mono">/usr/local/bin/opencode</code>
-                </div>
+                <div className="text-[11px] text-text-400 mt-1">{t('binaryPathHint')}</div>
               </div>
 
               <div className="grid gap-2 md:grid-cols-2">
                 <SettingRow
-                  label="Auto-start Service"
-                  description="Run opencode serve automatically when app launches"
+                  label={t('autoStartService')}
+                  description={t('autoStartServiceDesc')}
                   icon={<PlugIcon size={14} />}
                   onClick={handleAutoStartToggle}
                   className="bg-bg-100/35 border-border-200/45"
@@ -950,15 +936,15 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                 </SettingRow>
 
                 <SettingRow
-                  label="Service Status"
+                  label={t('serviceStatus')}
                   description={
                     serviceStarting
-                      ? 'Starting opencode serve...'
+                      ? t('startingOpencodeService')
                       : serviceRunning
                         ? startedByUs
-                          ? 'Running (started by app)'
-                          : 'Running (external)'
-                        : 'Not running'
+                          ? t('runningStartedByApp')
+                          : t('runningExternal')
+                        : t('notRunning')
                   }
                   icon={
                     serviceStarting ? (
@@ -974,17 +960,17 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                   <div className="flex items-center gap-2">
                     {!serviceStarting && !serviceRunning && (
                       <Button size="sm" variant="ghost" onClick={handleStartService}>
-                        Start
+                        {t('start')}
                       </Button>
                     )}
                     {!serviceStarting && serviceRunning && startedByUs && (
                       <Button size="sm" variant="ghost" onClick={handleStopService}>
                         <StopIcon size={12} className="mr-1" />
-                        Stop
+                        {t('stop')}
                       </Button>
                     )}
                     <Button size="sm" variant="ghost" onClick={handleCheckService} disabled={serviceStarting}>
-                      Refresh
+                      {t('refresh')}
                     </Button>
                   </div>
                 </SettingRow>
@@ -992,17 +978,15 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
 
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <div className="text-[11px] font-medium text-text-300">Environment Variables</div>
+                  <div className="text-[11px] font-medium text-text-300">{t('environmentVariables')}</div>
                   <button
                     className="text-[11px] text-accent-main-100 hover:text-accent-main-100/80 transition-colors"
                     onClick={() => serviceStore.setEnvVars([...envVars, { key: '', value: '' }])}
                   >
-                    + Add
+                    + {t('add')}
                   </button>
                 </div>
-                <div className="text-[11px] text-text-400 mb-2">
-                  Passed to the opencode serve process (e.g. HTTPS_PROXY, API keys)
-                </div>
+                <div className="text-[11px] text-text-400 mb-2">{t('envVarsDesc')}</div>
                 {envVars.length > 0 && (
                   <div className="flex flex-col gap-1.5">
                     {envVars.map((env, idx) => (
@@ -1039,7 +1023,7 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
                             const updated = envVars.filter((_, i) => i !== idx)
                             serviceStore.setEnvVars(updated)
                           }}
-                          title="Remove"
+                          title={t('remove')}
                         >
                           <TrashIcon size={12} />
                         </button>
@@ -1057,10 +1041,8 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
             </div>
           </SettingsCard>
         ) : (
-          <SettingsCard title="Local Service" description="This section is available on desktop app only">
-            <div className="text-[12px] text-text-400 leading-relaxed">
-              OpenCode web mode connects to external servers and does not manage a local background service
-            </div>
+          <SettingsCard title={t('localService')} description={t('desktopOnlyServiceDesc')}>
+            <div className="text-[12px] text-text-400 leading-relaxed">{t('openCodeWebModeHint')}</div>
           </SettingsCard>
         ))}
     </div>
@@ -1086,6 +1068,7 @@ function ServerItem({
   onDelete: () => void
   onCheckHealth: () => void
 }) {
+  const { t } = useI18n()
   const statusIcon = () => {
     if (!health || health.status === 'checking') return <SpinnerIcon size={12} className="animate-spin text-text-400" />
     if (health.status === 'online') return <WifiIcon size={12} className="text-success-100" />
@@ -1094,20 +1077,20 @@ function ServerItem({
   }
 
   const statusTitle = () => {
-    if (!health) return 'Check health'
+    if (!health) return t('checkHealth')
     switch (health.status) {
       case 'checking':
-        return 'Checking...'
+        return t('checking')
       case 'online':
         return `Online (${health.latency}ms)${health.version ? ` · OpenCode v${health.version}` : ''}`
       case 'unauthorized':
-        return 'Invalid credentials'
+        return t('invalidCredentials')
       case 'offline':
-        return health.error || 'Offline'
+        return health.error || t('offline')
       case 'error':
-        return health.error || 'Error'
+        return health.error || t('error')
       default:
-        return 'Unknown'
+        return t('unknown')
     }
   }
 
@@ -1132,7 +1115,7 @@ function ServerItem({
           <span className="text-[13px] font-medium text-text-100 truncate">{server.name}</span>
           {isActive && (
             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-medium text-accent-main-100 bg-accent-main-100/10 shrink-0">
-              Current
+              {t('current')}
             </span>
           )}
         </div>
@@ -1159,7 +1142,7 @@ function ServerItem({
             e.stopPropagation()
             onDelete()
           }}
-          title="Remove"
+          title={t('remove')}
         >
           <TrashIcon size={12} />
         </button>
@@ -1175,6 +1158,7 @@ function AddServerForm({
   onAdd: (name: string, url: string, username?: string, password?: string) => void
   onCancel: () => void
 }) {
+  const { t } = useI18n()
   const [name, setName] = useState('')
   const [url, setUrl] = useState('')
   const [username, setUsername] = useState('')
@@ -1185,17 +1169,17 @@ function AddServerForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!name.trim()) {
-      setError('Name required')
+      setError(t('nameRequired'))
       return
     }
     if (!url.trim()) {
-      setError('URL required')
+      setError(t('urlRequired'))
       return
     }
     try {
       new URL(url)
     } catch {
-      setError('Invalid URL')
+      setError(t('invalidUrl'))
       return
     }
 
@@ -1223,7 +1207,7 @@ function AddServerForm({
   return (
     <form onSubmit={handleSubmit} className="p-3 rounded-lg border border-border-200 bg-bg-050 space-y-2.5">
       <div>
-        <label className="block text-[11px] font-medium text-text-300 mb-1">Name</label>
+        <label className="block text-[11px] font-medium text-text-300 mb-1">{t('name')}</label>
         <input
           type="text"
           value={name}
@@ -1231,13 +1215,13 @@ function AddServerForm({
             setName(e.target.value)
             setError('')
           }}
-          placeholder="My Server"
+          placeholder={t('myServer')}
           className={inputCls}
           autoFocus
         />
       </div>
       <div>
-        <label className="block text-[11px] font-medium text-text-300 mb-1">URL</label>
+        <label className="block text-[11px] font-medium text-text-300 mb-1">{t('url')}</label>
         <input
           type="text"
           value={url}
@@ -1245,7 +1229,7 @@ function AddServerForm({
             setUrl(e.target.value)
             setError('')
           }}
-          placeholder="http://192.168.1.100:4096"
+          placeholder={t('serverUrlPlaceholder')}
           className={`${inputCls} font-mono`}
         />
       </div>
@@ -1256,13 +1240,13 @@ function AddServerForm({
         className="flex items-center gap-1.5 text-[11px] text-accent-main-100 hover:text-accent-main-200 transition-colors"
       >
         <KeyIcon size={10} />
-        {showAuth ? 'Hide authentication' : 'Add authentication'}
+        {showAuth ? t('hideAuthentication') : t('addAuthentication')}
       </button>
 
       {showAuth && (
         <>
           <div>
-            <label className="block text-[11px] font-medium text-text-300 mb-1">Username</label>
+            <label className="block text-[11px] font-medium text-text-300 mb-1">{t('username')}</label>
             <input
               type="text"
               value={username}
@@ -1270,12 +1254,12 @@ function AddServerForm({
                 setUsername(e.target.value)
                 setError('')
               }}
-              placeholder="opencode (default)"
+              placeholder={t('opencodeDefault')}
               className={inputCls}
             />
           </div>
           <div>
-            <label className="block text-[11px] font-medium text-text-300 mb-1">Password</label>
+            <label className="block text-[11px] font-medium text-text-300 mb-1">{t('password')}</label>
             <input
               type="password"
               value={password}
@@ -1290,7 +1274,7 @@ function AddServerForm({
 
           {isCrossOrigin && password.trim() && (
             <div className="text-[11px] text-warning-100 bg-warning-bg border border-warning-100/20 rounded-md px-2.5 py-2 leading-relaxed">
-              Cross-origin + password may not work due to a backend CORS limitation (
+              {t('crossOriginPasswordWarning')} (
               <a
                 href="https://github.com/anomalyco/opencode/issues/10047"
                 target="_blank"
@@ -1299,24 +1283,21 @@ function AddServerForm({
               >
                 #10047
               </a>
-              ). Consider deploying the UI on the same origin or starting the server without a password.
+              )
             </div>
           )}
 
-          <div className="text-[11px] text-text-400 leading-relaxed">
-            Credentials are stored in localStorage. For same-origin setups, the browser can handle auth natively without
-            entering credentials here.
-          </div>
+          <div className="text-[11px] text-text-400 leading-relaxed">{t('credentialsStoredHint')}</div>
         </>
       )}
 
       {error && <p className="text-[11px] text-danger-100">{error}</p>}
       <div className="flex justify-end gap-2 pt-1">
         <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" size="sm">
-          Add
+          {t('add')}
         </Button>
       </div>
     </form>
@@ -1324,6 +1305,7 @@ function AddServerForm({
 }
 
 function ServersSettings() {
+  const { t } = useI18n()
   const [addingServer, setAddingServer] = useState(false)
   const { servers, activeServer, addServer, removeServer, setActiveServer, checkHealth, checkAllHealth, getHealth } =
     useServerStore()
@@ -1358,22 +1340,22 @@ function ServersSettings() {
   return (
     <div className="space-y-4">
       <SettingsCard
-        title="Connections"
-        description="Manage backend endpoints and choose which server this session uses"
+        title={t('connections')}
+        description={t('connectionsDesc')}
         actions={
           <div className="flex items-center gap-2">
             <button
               onClick={checkAllHealth}
               className="text-[11px] px-2 py-1 rounded-md border border-border-200/60 text-text-300 hover:text-text-100 hover:border-border-300/70 hover:bg-bg-100/60 transition-colors"
             >
-              Refresh
+              {t('refresh')}
             </button>
             {!addingServer && (
               <button
                 onClick={() => setAddingServer(true)}
                 className="flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border border-accent-main-100/40 text-accent-main-100 hover:text-accent-main-200 hover:border-accent-main-100/60 hover:bg-accent-main-100/5 transition-colors"
               >
-                <PlusIcon size={10} /> Add
+                <PlusIcon size={10} /> {t('add')}
               </button>
             )}
           </div>
@@ -1405,7 +1387,7 @@ function ServersSettings() {
           )}
 
           {servers.length === 0 && !addingServer && (
-            <div className="text-[13px] text-text-400 text-center py-8">No servers configured</div>
+            <div className="text-[13px] text-text-400 text-center py-8">{t('noServersConfigured')}</div>
           )}
         </div>
       </SettingsCard>
@@ -1417,48 +1399,48 @@ function ServersSettings() {
 // Nav Tabs
 // ============================================
 
-const TABS: { id: SettingsTab; label: string; description: string; icon: React.ReactNode }[] = [
+const TABS: { id: SettingsTab; labelKey: string; descriptionKey: string; icon: React.ReactNode }[] = [
   {
     id: 'servers',
-    label: 'Servers',
-    description: 'Backend connections and fast active endpoint switching',
+    labelKey: 'tabServers',
+    descriptionKey: 'tabServersDesc',
     icon: <GlobeIcon size={15} />,
   },
   {
     id: 'chat',
-    label: 'Chat',
-    description: 'Reasoning style, path display, and conversation behavior',
+    labelKey: 'tabChat',
+    descriptionKey: 'tabChatDesc',
     icon: <SettingsIcon size={15} />,
   },
   {
     id: 'appearance',
-    label: 'Appearance',
-    description: 'Theme, color mode, and layout preferences',
+    labelKey: 'tabAppearance',
+    descriptionKey: 'tabAppearanceDesc',
     icon: <SunIcon size={15} />,
   },
   {
     id: 'notifications',
-    label: 'Notifications',
-    description: 'Desktop and in-app alerts',
+    labelKey: 'tabNotifications',
+    descriptionKey: 'tabNotificationsDesc',
     icon: <BellIcon size={15} />,
   },
   {
     id: 'service',
-    label: 'Service',
-    description: 'Local opencode service management',
+    labelKey: 'tabService',
+    descriptionKey: 'tabServiceDesc',
     icon: <PlugIcon size={15} />,
   },
   {
     id: 'keybindings',
-    label: 'Shortcuts',
-    description: 'Customize keyboard shortcuts for faster workflows',
+    labelKey: 'tabShortcuts',
+    descriptionKey: 'tabShortcutsDesc',
     icon: <KeyboardIcon size={15} />,
   },
 ]
 
-const TAB_GROUPS: { label: string; tabs: SettingsTab[] }[] = [
-  { label: 'Core', tabs: ['servers', 'chat', 'appearance', 'notifications'] },
-  { label: 'Advanced', tabs: ['service', 'keybindings'] },
+const TAB_GROUPS: { labelKey: string; tabs: SettingsTab[] }[] = [
+  { labelKey: 'core', tabs: ['servers', 'chat', 'appearance', 'notifications'] },
+  { labelKey: 'advanced', tabs: ['service', 'keybindings'] },
 ]
 
 // ============================================
@@ -1536,6 +1518,7 @@ export function SettingsDialog({
   customCSS,
   onCustomCSSChange,
 }: SettingsDialogProps) {
+  const { t } = useI18n()
   const isMobile = useIsMobile()
   const isTauriDesktop = isTauri() && !isMobile
   const normalizeTab = useCallback((next: SettingsDialogProps['initialTab']): SettingsTab => {
@@ -1606,7 +1589,7 @@ export function SettingsDialog({
           {/* Top: Title + Close */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-border-100/50 shrink-0">
             <div>
-              <div className="text-sm font-semibold text-text-100">Settings</div>
+              <div className="text-sm font-semibold text-text-100">{t('settings')}</div>
               <div className="text-[11px] text-text-400 mt-0.5">{APP_VERSION_LABEL}</div>
             </div>
             <button
@@ -1627,7 +1610,7 @@ export function SettingsDialog({
                   ${t.id === tab ? 'bg-bg-100 text-text-100' : 'text-text-400 active:bg-bg-100/50'}`}
               >
                 {t.icon}
-                {t.label}
+                {translation(t.labelKey)}
               </button>
             ))}
           </div>
@@ -1651,16 +1634,16 @@ export function SettingsDialog({
           onKeyDown={handleTabKeyDown}
         >
           <div className="px-3 mb-4">
-            <div className="text-sm font-semibold text-text-100">Settings</div>
+            <div className="text-sm font-semibold text-text-100">{t('settings')}</div>
             <div className="text-[11px] text-text-400 mt-0.5 leading-relaxed">
-              Customize UI, behavior, and server setup
+              {t('customizeUiBehaviorServerSetup')}
             </div>
           </div>
           <div className="space-y-3">
             {groupedTabs.map(group => (
-              <div key={group.label}>
+              <div key={group.labelKey}>
                 <div className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-text-400/90">
-                  {group.label}
+                  {translation(group.labelKey)}
                 </div>
                 <div className="space-y-1">
                   {group.tabs.map(t => (
@@ -1676,7 +1659,7 @@ export function SettingsDialog({
                         }`}
                     >
                       {t.icon}
-                      {t.label}
+                      {translation(t.labelKey)}
                     </button>
                   ))}
                 </div>
@@ -1691,13 +1674,15 @@ export function SettingsDialog({
         <div className="flex-1 min-w-0 flex flex-col">
           <div className="shrink-0 border-b border-border-100/60 px-6 py-4 flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="text-base font-semibold text-text-100">{activeTabMeta.label}</div>
-              <div className="text-[12px] text-text-400 mt-0.5 leading-relaxed">{activeTabMeta.description}</div>
+              <div className="text-base font-semibold text-text-100">{translation(activeTabMeta.labelKey)}</div>
+              <div className="text-[12px] text-text-400 mt-0.5 leading-relaxed">
+                {translation(activeTabMeta.descriptionKey)}
+              </div>
             </div>
             <button
               onClick={onClose}
               className="p-2 text-text-400 hover:text-text-200 hover:bg-bg-100 rounded-md transition-colors -mr-1"
-              aria-label="Close settings"
+              aria-label={t('closeSettings')}
             >
               <CloseIcon size={18} />
             </button>

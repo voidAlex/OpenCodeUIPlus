@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { CloseIcon } from '../Icons'
+import { t } from '../../i18n'
 import { useDelayedRender } from '../../hooks/useDelayedRender'
 
 interface DialogProps {
@@ -211,7 +212,7 @@ export function Dialog({
                   <button
                     onClick={onClose}
                     className="p-2 text-text-400 hover:text-text-200 hover:bg-bg-100 rounded-md transition-colors"
-                    title="Close"
+                    title={t('close')}
                   >
                     <CloseIcon size={18} />
                   </button>

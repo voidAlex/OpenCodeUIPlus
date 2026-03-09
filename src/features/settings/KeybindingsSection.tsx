@@ -8,6 +8,7 @@ import { useKeybindingStore } from '../../hooks/useKeybindings'
 import { keyEventToString, formatKeybinding, parseKeybinding } from '../../store/keybindingStore'
 import { UndoIcon, SearchIcon } from '../../components/Icons'
 import type { KeybindingConfig, KeybindingAction } from '../../store/keybindingStore'
+import { useI18n } from '../../i18n'
 
 // ============================================
 // Kbd - 按键胶囊
@@ -51,6 +52,7 @@ interface KeybindingRowProps {
 }
 
 function KeybindingRow({ config, onEdit, onReset, isKeyUsed }: KeybindingRowProps) {
+  const { t } = useI18n()
   const [isEditing, setIsEditing] = useState(false)
   const [tempKey, setTempKey] = useState('')
   const [error, setError] = useState('')
@@ -122,7 +124,7 @@ function KeybindingRow({ config, onEdit, onReset, isKeyUsed }: KeybindingRowProp
           onClick={() => onReset(config.action)}
           className="p-1 mr-1 rounded text-text-400 hover:text-text-100 hover:bg-bg-200 
                      opacity-0 group-hover:opacity-100 transition-opacity"
-          title="Reset to default"
+          title={t('resetToDefault')}
         >
           <UndoIcon size={12} />
         </button>
@@ -183,16 +185,8 @@ const CATEGORY_ORDER: KeybindingConfig['category'][] = [
   'permission',
 ]
 
-const CATEGORY_LABELS: Record<KeybindingConfig['category'], string> = {
-  general: 'General',
-  session: 'Session',
-  terminal: 'Terminal',
-  model: 'Model',
-  message: 'Message',
-  permission: 'Permission',
-}
-
 export function KeybindingsSection() {
+  const { t } = useI18n()
   const { keybindings, setKeybinding, resetKeybinding, resetAll, isKeyUsed } = useKeybindingStore()
   const [search, setSearch] = useState('')
   const searchRef = useRef<HTMLInputElement>(null)
@@ -224,17 +218,26 @@ export function KeybindingsSection() {
     searchRef.current?.focus()
   }, [])
 
+  const CATEGORY_LABELS: Record<KeybindingConfig['category'], string> = {
+    general: t('general'),
+    session: t('session'),
+    terminal: t('terminal'),
+    model: t('model'),
+    message: t('messages'),
+    permission: t('permission'),
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-medium text-text-400 uppercase tracking-wider">Keyboard Shortcuts</span>
+        <span className="text-xs font-medium text-text-400 uppercase tracking-wider">{t('keyboardShortcuts')}</span>
         {hasModifications && (
           <button
             onClick={resetAll}
             className="text-[11px] text-text-400 hover:text-danger-100 px-2 py-0.5 rounded hover:bg-danger-100/10 transition-colors"
           >
-            Reset all
+            {t('resetAll')}
           </button>
         )}
       </div>
@@ -247,7 +250,7 @@ export function KeybindingsSection() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Filter..."
+          placeholder={t('filter')}
           className="w-full h-8 pl-8 pr-3 text-[13px] bg-bg-050 border border-border-200 rounded-lg
                      text-text-100 placeholder:text-text-400 
                      focus:outline-none focus:border-accent-main-100/50 transition-colors"
@@ -257,7 +260,7 @@ export function KeybindingsSection() {
       {/* List */}
       <div className="flex-1 overflow-y-auto -mx-1 custom-scrollbar">
         {grouped.length === 0 ? (
-          <div className="py-8 text-center text-sm text-text-400">No matches</div>
+          <div className="py-8 text-center text-sm text-text-400">{t('noMatches')}</div>
         ) : (
           grouped.map(({ category, items }) => (
             <div key={category} className="mb-3">
@@ -279,10 +282,7 @@ export function KeybindingsSection() {
       </div>
 
       {/* Help */}
-      <div className="pt-3 mt-2 border-t border-border-100/50 text-[11px] text-text-400">
-        Click a shortcut to rebind. <kbd className="px-1 py-0.5 bg-bg-100 rounded font-mono text-text-300">Enter</kbd>{' '}
-        confirm, <kbd className="px-1 py-0.5 bg-bg-100 rounded font-mono text-text-300">Esc</kbd> cancel.
-      </div>
+      <div className="pt-3 mt-2 border-t border-border-100/50 text-[11px] text-text-400">{t('shortcutRebindHelp')}</div>
     </div>
   )
 }

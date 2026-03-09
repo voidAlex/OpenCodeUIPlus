@@ -745,6 +745,7 @@ interface ActiveSessionItemProps {
 }
 
 function ActiveSessionItem({ entry, resolvedSession, isSelected, onSelect }: ActiveSessionItemProps) {
+  const { t } = useI18n()
   const isRetry = entry.status.type === 'retry'
   const pending = entry.pendingAction
   // 标题优先从 resolvedSession 取，然后 fallback 到 entry.title（sessionMeta），最后截取 ID
@@ -755,12 +756,12 @@ function ActiveSessionItem({ entry, resolvedSession, isSelected, onSelect }: Act
   // 状态显示：permission > question > retry > working
   const statusConfig =
     pending?.type === 'permission'
-      ? { label: 'Awaiting Permission', color: 'text-warning-100', dotColor: 'bg-warning-100', pulse: false }
+      ? { label: t('awaitingPermission'), color: 'text-warning-100', dotColor: 'bg-warning-100', pulse: false }
       : pending?.type === 'question'
-        ? { label: 'Awaiting Answer', color: 'text-info-100', dotColor: 'bg-info-100', pulse: false }
+        ? { label: t('awaitingAnswer'), color: 'text-info-100', dotColor: 'bg-info-100', pulse: false }
         : isRetry
-          ? { label: 'Retrying', color: 'text-warning-100', dotColor: 'bg-warning-100', pulse: false }
-          : { label: 'Working', color: 'text-success-100', dotColor: 'bg-success-100', pulse: true }
+          ? { label: t('retrying'), color: 'text-warning-100', dotColor: 'bg-warning-100', pulse: false }
+          : { label: t('working'), color: 'text-success-100', dotColor: 'bg-success-100', pulse: true }
 
   const handleClick = () => {
     if (resolvedSession) {
@@ -839,10 +840,10 @@ function formatNotificationTime(ts: number): string {
 }
 
 const notifTypeConfig = {
-  completed: { icon: CheckIcon, color: 'text-success-100', bgAccent: 'bg-success-bg', label: 'Completed' },
-  error: { icon: AlertCircleIcon, color: 'text-danger-100', bgAccent: 'bg-danger-bg', label: 'Error' },
-  permission: { icon: HandIcon, color: 'text-warning-100', bgAccent: 'bg-warning-bg', label: 'Permission' },
-  question: { icon: QuestionIcon, color: 'text-info-100', bgAccent: 'bg-info-bg', label: 'Question' },
+  completed: { icon: CheckIcon, color: 'text-success-100', bgAccent: 'bg-success-bg', labelKey: 'completed' },
+  error: { icon: AlertCircleIcon, color: 'text-danger-100', bgAccent: 'bg-danger-bg', labelKey: 'error' },
+  permission: { icon: HandIcon, color: 'text-warning-100', bgAccent: 'bg-warning-bg', labelKey: 'permission' },
+  question: { icon: QuestionIcon, color: 'text-info-100', bgAccent: 'bg-info-bg', labelKey: 'question' },
 } as const
 
 interface NotificationItemProps {
@@ -890,7 +891,7 @@ function NotificationItem({ entry, resolvedSession, onSelect }: NotificationItem
           {displayTitle}
         </p>
         <div className="flex items-center mt-0.5 min-w-0 overflow-hidden text-[10px] text-text-400 gap-1">
-          <span className={`shrink-0 ${config.color}`}>{config.label}</span>
+          <span className={`shrink-0 ${config.color}`}>{t(config.labelKey as never)}</span>
           {entry.body && (
             <>
               <span className="opacity-30 shrink-0">·</span>
@@ -1144,7 +1145,7 @@ function SidebarFooter({
           {/* Context Stats */}
           <div className="p-3 border-b border-border-200/30">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-text-200">Context Usage</span>
+              <span className="text-xs font-medium text-text-200">{t('contextUsage')}</span>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-mono text-text-400">{Math.round(stats.contextPercent)}%</span>
                 <button
@@ -1161,7 +1162,7 @@ function SidebarFooter({
                 transition-colors
               "
                 >
-                  View details
+                  {t('viewDetails')}
                 </button>
               </div>
             </div>
@@ -1181,7 +1182,9 @@ function SidebarFooter({
 
           {/* Theme Selector */}
           <div className="p-2 border-b border-border-200/30">
-            <div className="text-[10px] font-bold text-text-400 uppercase tracking-wider px-1 mb-1.5">Appearance</div>
+            <div className="text-[10px] font-bold text-text-400 uppercase tracking-wider px-1 mb-1.5">
+              {t('appearance')}
+            </div>
             <div className="flex bg-bg-200/50 p-1 rounded-lg border border-border-200/30 relative isolate">
               <div
                 className="absolute top-1 bottom-1 left-1 w-[calc((100%-8px)/3)] bg-bg-000 rounded-md shadow-sm ring-1 ring-border-200/50 transition-transform duration-300 ease-out -z-10"
