@@ -25,6 +25,7 @@ interface SidebarProps {
   onToggleWideMode?: () => void
   projectDialogOpen?: boolean
   onProjectDialogClose?: () => void
+  hasSubagentPanel?: boolean
 }
 
 export const Sidebar = memo(function Sidebar({
@@ -42,6 +43,7 @@ export const Sidebar = memo(function Sidebar({
   onToggleWideMode,
   projectDialogOpen,
   onProjectDialogClose,
+  hasSubagentPanel = false,
 }: SidebarProps) {
   const [isProjectDialogOpen, setIsProjectDialogOpen] = useState(false)
   const { addDirectory, pathInfo } = useDirectory()
@@ -269,7 +271,7 @@ export const Sidebar = memo(function Sidebar({
         style={{ width: isOpen ? `${width}px` : `${RAIL_WIDTH}px` }}
         className={`
           relative flex flex-col h-full bg-bg-100 overflow-hidden shrink-0
-          border-r border-border-200/50
+          ${hasSubagentPanel ? '' : 'border-r border-border-200/50'}
           ${isResizing ? 'transition-none' : 'transition-[width] duration-300 ease-out'}
         `}
       >

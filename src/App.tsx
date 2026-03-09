@@ -27,6 +27,7 @@ import type { Attachment } from './api'
 import { createPtySession } from './api/pty'
 import { autoApproveStore } from './store/autoApproveStore'
 import type { TerminalTab } from './store/layoutStore'
+import { useI18n } from './i18n'
 
 const SettingsDialog = lazy(() =>
   import('./features/settings/SettingsDialog').then(module => ({ default: module.SettingsDialog })),
@@ -39,6 +40,7 @@ const CloseServiceDialog = lazy(() =>
 )
 
 function App() {
+  const { t } = useI18n()
   // ============================================
   // Refs
   // ============================================
@@ -51,6 +53,7 @@ function App() {
   // Cancel Hint (double-Esc to abort)
   // ============================================
   const [showCancelHint, setShowCancelHint] = useState(false)
+  const [pendingSubagentJumpMessageId, setPendingSubagentJumpMessageId] = useState<string | null>(null)
 
   // ============================================
   // Full Auto Hint
@@ -229,6 +232,7 @@ function App() {
     setSelectedAgent,
     routeSessionId,
     subagentList,
+    subagentPanelContext,
     loadState,
     hasMoreHistory,
     retryStatus,
@@ -261,6 +265,7 @@ function App() {
     handleRedoWithAnimation,
     handleSelectSession,
     handleOpenSessionById,
+    handleBackToParentSession,
     handleNewSession,
     handleVisibleMessageIdsChange,
     handleArchiveSession,
@@ -269,6 +274,19 @@ function App() {
     handleCopyLastResponse,
     restoreAgentFromMessage,
   } = useChatSession({ chatAreaRef, currentModel, refetchModels })
+
+  useEffect(() => {
+    if (!pendingSubagentJumpMessageId) return
+    if (!subagentPanelContext.parentSessionId) return
+    if (routeSessionId !== subagentPanelContext.parentSessionId) return
+
+    const timer = window.setTimeout(() => {
+      chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
+      setPendingSubagentJumpMessageId(null)
+    }, 120)
+
+    return () => window.clearTimeout(timer)
+  }, [pendingSubagentJumpMessageId, routeSessionId, subagentPanelContext.parentSessionId])
 
   // 赋值 ref（需在 useChatSession 之后，因为 handleVisibleMessageIdsChange 来自该 hook）
   handleVisibleMessageIdsChangeRef.current = handleVisibleMessageIdsChange
@@ -717,6 +735,7 @@ function App() {
         onToggleWideMode={toggleWideMode}
         projectDialogOpen={projectDialogOpen}
         onProjectDialogClose={closeProjectDialog}
+        hasSubagentPanel={subagentList.length > 0 || subagentPanelContext.isInChildSession}
       />
 
       {/* Main Content Area: Chat Column + Right Panel */}
@@ -780,21 +799,12 @@ function App() {
                         <kbd className="mx-0.5 px-1.5 py-0.5 bg-bg-200 border border-border-200 rounded text-[11px] font-mono font-medium text-text-200">
                           Esc
                         </kbd>{' '}
-                        again to stop
+                        {t('againToStop')}
                       </>
                     ) : (
                       fullAutoHint
                     )}
                   </div>
-                </div>
-              )}
-              {subagentList.length > 0 && (
-                <div className="pointer-events-auto">
-                  <SubagentListInline
-                    items={subagentList}
-                    onOpenSession={handleOpenSessionById}
-                    onJumpToMessage={messageId => chatAreaRef.current?.scrollToMessageId(messageId)}
-                  />
                 </div>
               )}
               <InputBox
@@ -849,7 +859,7 @@ function App() {
                 collapsedQuestion={
                   pendingPermissionRequests.length === 0 && pendingQuestionRequests.length > 0 && questionCollapsed
                     ? {
-                        label: 'Question',
+                        label: t('question'),
                         queueLength: pendingQuestionRequests.length,
                         onExpand: () => setQuestionCollapsed(false),
                       }
@@ -888,6 +898,26 @@ function App() {
           {/* Bottom Panel */}
           <BottomPanel directory={effectiveDirectory} />
         </div>
+
+        {(subagentList.length > 0 || subagentPanelContext.isInChildSession) && (
+          <div className="hidden lg:flex w-[320px] shrink-0 min-w-0">
+            <SubagentListInline
+              items={subagentList}
+              onOpenSession={handleOpenSessionById}
+              onJumpToMessage={messageId => {
+                if (subagentPanelContext.isInChildSession) {
+                  setPendingSubagentJumpMessageId(messageId)
+                  handleBackToParentSession()
+                  return
+                }
+                chatAreaRef.current?.scrollToMessageId(messageId)
+              }}
+              isInChildSession={subagentPanelContext.isInChildSession}
+              onBackToParentSession={handleBackToParentSession}
+              parentSessionTitle={subagentPanelContext.parentSessionTitle}
+            />
+          </div>
+        )}
 
         {/* Right Panel - 占满整个高度 */}
         <RightPanel />

@@ -8,6 +8,7 @@ import { Terminal } from './Terminal'
 import { PlusIcon, CloseIcon, TerminalIcon, ChevronDownIcon } from './Icons'
 import { layoutStore, useLayoutStore, type TerminalTab } from '../store/layoutStore'
 import { createPtySession, removePtySession, listPtySessions } from '../api/pty'
+import { useI18n } from '../i18n'
 
 // 常量
 const MIN_HEIGHT = 100
@@ -18,6 +19,7 @@ interface TerminalPanelProps {
 }
 
 export const TerminalPanel = memo(function TerminalPanel({ directory }: TerminalPanelProps) {
+  const { t } = useI18n()
   const { bottomPanelOpen, bottomPanelHeight, terminalTabs, activeTerminalId } = useLayoutStore()
 
   const [isResizing, setIsResizing] = useState(false)
@@ -47,7 +49,7 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
             if (!layoutStore.getTerminalTabs().some(t => t.id === pty.id)) {
               const tab: TerminalTab = {
                 id: pty.id,
-                title: pty.title || 'Terminal',
+                title: pty.title || t('terminal'),
                 status: pty.running ? 'connecting' : 'exited',
               }
               layoutStore.addTerminalTab(tab, false) // 不自动打开面板
@@ -62,7 +64,7 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
     }
 
     restoreSessions()
-  }, [directory])
+  }, [directory, t])
 
   // 创建新终端
   const handleNewTerminal = useCallback(async () => {
@@ -72,14 +74,14 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
       console.log('[TerminalPanel] PTY created:', pty)
       const tab: TerminalTab = {
         id: pty.id,
-        title: pty.title || 'Terminal',
+        title: pty.title || t('terminal'),
         status: 'connecting',
       }
       layoutStore.addTerminalTab(tab)
     } catch (error) {
       console.error('[TerminalPanel] Failed to create terminal:', error)
     }
-  }, [directory])
+  }, [directory, t])
 
   // 关闭终端
   const handleCloseTerminal = useCallback(
@@ -201,7 +203,7 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
           <button
             onClick={handleNewTerminal}
             className="p-1.5 ml-1 text-text-400 hover:text-text-100 hover:bg-bg-200/50 rounded-md transition-colors shrink-0"
-            title="New Terminal"
+            title={t('newTerminal')}
           >
             <PlusIcon size={14} />
           </button>
@@ -212,7 +214,7 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
           <button
             onClick={handleCollapse}
             className="p-1.5 text-text-400 hover:text-text-100 hover:bg-bg-200/50 rounded-md transition-colors"
-            title="Hide Panel"
+            title={t('hidePanel')}
           >
             <ChevronDownIcon size={14} />
           </button>
@@ -224,17 +226,17 @@ export const TerminalPanel = memo(function TerminalPanel({ directory }: Terminal
         {isRestoring ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
             <TerminalIcon size={24} className="opacity-30 animate-pulse" />
-            <span>Restoring sessions...</span>
+            <span>{t('restoringSessions')}</span>
           </div>
         ) : terminalTabs.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
             <TerminalIcon size={24} className="opacity-30" />
-            <span>No terminals</span>
+            <span>{t('noContent')}</span>
             <button
               onClick={handleNewTerminal}
               className="px-3 py-1.5 text-xs bg-bg-200/50 hover:bg-bg-200 text-text-200 rounded-md transition-colors"
             >
-              Create Terminal
+              {t('createTerminal')}
             </button>
           </div>
         ) : (

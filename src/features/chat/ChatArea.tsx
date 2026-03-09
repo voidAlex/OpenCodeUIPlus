@@ -545,7 +545,10 @@ export const ChatArea = memo(
             }
           },
           scrollToMessageId: (messageId: string) => {
-            const index = visibleMessagesRef.current.findIndex(m => m.info.id === messageId)
+            const entries = visibleMessageEntriesRef.current
+            const index = entries.findIndex(
+              entry => entry.message.info.id === messageId || entry.sourceIds.includes(messageId),
+            )
             if (index < 0) return
 
             suppressScrollRef.current = true

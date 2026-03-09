@@ -28,6 +28,7 @@ import {
 } from '../api/mcp'
 import type { MCPStatus, McpServerConfig } from '../types/api/mcp'
 import { useDirectory } from '../hooks'
+import { useI18n } from '../i18n'
 
 // ============================================
 // Types
@@ -47,6 +48,7 @@ interface McpPanelProps {
 }
 
 export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpPanelProps) {
+  const { t } = useI18n()
   const { currentDirectory } = useDirectory()
   const [servers, setServers] = useState<ServerEntry[]>([])
   const [loading, setLoading] = useState(true)
@@ -72,11 +74,11 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
       setServers(entries)
     } catch (err) {
       console.error('[McpPanel] Failed to load MCP status:', err)
-      setError('Failed to load MCP servers')
+      setError(t('failedLoadMcpServers'))
     } finally {
       setLoading(false)
     }
-  }, [currentDirectory])
+  }, [currentDirectory, t])
 
   // 初始加载
   useEffect(() => {
@@ -180,7 +182,7 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
       <div className="flex items-center justify-between px-3 py-2 border-b border-border-100">
         <div className="flex items-center gap-2 text-text-100 text-sm font-medium">
           <PlugIcon size={14} />
-          <span>MCP Servers</span>
+          <span>{t('mcpServers')}</span>
           {!loading && <span className="text-text-400 text-xs">({servers.length})</span>}
         </div>
         <div className="flex items-center gap-1">
@@ -188,7 +190,7 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
             onClick={() => setShowAddForm(true)}
             disabled={showAddForm}
             className="p-1 hover:bg-bg-200 rounded text-text-300 hover:text-text-100 transition-colors disabled:opacity-50"
-            title="Add Server"
+            title={t('addServer')}
           >
             <PlusIcon size={14} />
           </button>
@@ -196,7 +198,7 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
             onClick={handleRefresh}
             disabled={loading}
             className="p-1 hover:bg-bg-200 rounded text-text-300 hover:text-text-100 transition-colors disabled:opacity-50"
-            title="Refresh"
+            title={t('refresh')}
           >
             <RetryIcon size={14} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -217,7 +219,7 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
         {loading && servers.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
             <SpinnerIcon size={20} className="animate-spin opacity-50" />
-            <span>Loading servers...</span>
+            <span>{t('loadingServers')}</span>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
@@ -227,18 +229,18 @@ export const McpPanel = memo(function McpPanel({ isResizing: _isResizing }: McpP
               onClick={handleRefresh}
               className="px-3 py-1.5 text-xs bg-bg-200/50 hover:bg-bg-200 text-text-200 rounded-md transition-colors"
             >
-              Retry
+              {t('retry')}
             </button>
           </div>
         ) : servers.length === 0 && !showAddForm ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2 px-4 text-center">
             <PlugIcon size={24} className="opacity-30" />
-            <span>No MCP servers configured</span>
+            <span>{t('noMcpServersConfigured')}</span>
             <button
               onClick={() => setShowAddForm(true)}
               className="px-3 py-1.5 text-xs bg-bg-200/50 hover:bg-bg-200 text-text-200 rounded-md transition-colors"
             >
-              Add Server
+              {t('addServer')}
             </button>
           </div>
         ) : (
@@ -271,6 +273,7 @@ interface AddServerFormProps {
 }
 
 const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoading }: AddServerFormProps) {
+  const { t } = useI18n()
   const [serverType, setServerType] = useState<'local' | 'remote'>('local')
   const [name, setName] = useState('')
   const [command, setCommand] = useState('')
@@ -282,14 +285,14 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
     setError(null)
 
     if (!name.trim()) {
-      setError('Server name is required')
+      setError(t('serverNameRequired'))
       return
     }
 
     try {
       if (serverType === 'local') {
         if (!command.trim()) {
-          setError('Command is required')
+          setError(t('commandRequired'))
           return
         }
         // 解析命令为数组
@@ -300,7 +303,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
         })
       } else {
         if (!url.trim()) {
-          setError('URL is required')
+          setError(t('urlRequired'))
           return
         }
         await onSubmit(name.trim(), {
@@ -309,14 +312,14 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
         })
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add server')
+      setError(err instanceof Error ? err.message : t('failedAddServer'))
     }
   }
 
   return (
     <form onSubmit={handleSubmit} className="p-3 border-b border-border-100 bg-bg-200/30">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-medium text-text-100">Add MCP Server</span>
+        <span className="text-sm font-medium text-text-100">{t('addMcpServer')}</span>
         <button
           type="button"
           onClick={onCancel}
@@ -337,7 +340,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
               : 'bg-bg-200/50 text-text-300 border border-transparent hover:bg-bg-200'
           }`}
         >
-          Local
+          {t('local')}
         </button>
         <button
           type="button"
@@ -348,7 +351,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
               : 'bg-bg-200/50 text-text-300 border border-transparent hover:bg-bg-200'
           }`}
         >
-          Remote
+          {t('remote')}
         </button>
       </div>
 
@@ -358,7 +361,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
           type="text"
           value={name}
           onChange={e => setName(e.target.value)}
-          placeholder="Server name"
+          placeholder={t('serverName')}
           className="w-full px-2 py-1.5 text-xs bg-bg-100 border border-border-200 rounded text-text-100 placeholder-text-500 focus:outline-none focus:border-accent-main-100"
         />
       </div>
@@ -370,7 +373,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
             type="text"
             value={command}
             onChange={e => setCommand(e.target.value)}
-            placeholder="Command (e.g., npx -y @modelcontextprotocol/server-github)"
+            placeholder={t('commandPlaceholder')}
             className="w-full px-2 py-1.5 text-xs bg-bg-100 border border-border-200 rounded text-text-100 placeholder-text-500 focus:outline-none focus:border-accent-main-100"
           />
         </div>
@@ -383,7 +386,7 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
             type="text"
             value={url}
             onChange={e => setUrl(e.target.value)}
-            placeholder="Server URL (e.g., https://mcp.example.com)"
+            placeholder={t('serverUrlPlaceholder')}
             className="w-full px-2 py-1.5 text-xs bg-bg-100 border border-border-200 rounded text-text-100 placeholder-text-500 focus:outline-none focus:border-accent-main-100"
           />
         </div>
@@ -401,12 +404,12 @@ const AddServerForm = memo(function AddServerForm({ onSubmit, onCancel, isLoadin
         {isLoading ? (
           <>
             <SpinnerIcon size={12} className="animate-spin" />
-            Adding...
+            {t('adding')}
           </>
         ) : (
           <>
             <PlusIcon size={12} />
-            Add Server
+            {t('addServer')}
           </>
         )}
       </button>
@@ -427,6 +430,7 @@ interface ServerItemProps {
 }
 
 const ServerItem = memo(function ServerItem({ server, isLoading, onConnect, onDisconnect, onAuth }: ServerItemProps) {
+  const { t } = useI18n()
   const { name, status } = server
   const [expanded, setExpanded] = useState(false)
 
@@ -447,15 +451,15 @@ const ServerItem = memo(function ServerItem({ server, isLoading, onConnect, onDi
   const getStatusInfo = () => {
     switch (status.status) {
       case 'connected':
-        return { color: 'text-success-100', label: 'Connected', icon: CheckIcon }
+        return { color: 'text-success-100', label: t('connectionConnected'), icon: CheckIcon }
       case 'disabled':
-        return { color: 'text-text-400', label: 'Disabled', icon: null }
+        return { color: 'text-text-400', label: t('disabled'), icon: null }
       case 'failed':
-        return { color: 'text-danger-100', label: 'Failed', icon: AlertCircleIcon }
+        return { color: 'text-danger-100', label: t('failed'), icon: AlertCircleIcon }
       case 'needs_auth':
-        return { color: 'text-warning-100', label: 'Needs Auth', icon: KeyIcon }
+        return { color: 'text-warning-100', label: t('needsAuth'), icon: KeyIcon }
       case 'needs_client_registration':
-        return { color: 'text-warning-100', label: 'Needs Registration', icon: KeyIcon }
+        return { color: 'text-warning-100', label: t('needsRegistration'), icon: KeyIcon }
       default:
         return { color: 'text-text-400', label: 'Unknown', icon: null }
     }
@@ -480,7 +484,7 @@ const ServerItem = memo(function ServerItem({ server, isLoading, onConnect, onDi
             }}
             className="px-2 py-0.5 text-xs bg-bg-300/50 hover:bg-danger-bg hover:text-danger-100 text-text-300 rounded transition-colors"
           >
-            Disconnect
+            {t('disconnect')}
           </button>
         )
       case 'disabled':
@@ -493,7 +497,7 @@ const ServerItem = memo(function ServerItem({ server, isLoading, onConnect, onDi
             }}
             className="px-2 py-0.5 text-xs bg-bg-300/50 hover:bg-success-bg hover:text-success-100 text-text-300 rounded transition-colors"
           >
-            Connect
+            {t('connect')}
           </button>
         )
       case 'needs_auth':
@@ -507,7 +511,7 @@ const ServerItem = memo(function ServerItem({ server, isLoading, onConnect, onDi
             className="px-2 py-0.5 text-xs bg-warning-bg hover:bg-warning-bg/80 text-warning-100 rounded transition-colors flex items-center gap-1"
           >
             <ExternalLinkIcon size={10} />
-            Authenticate
+            {t('authenticate')}
           </button>
         )
       default:

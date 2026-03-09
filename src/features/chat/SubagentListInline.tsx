@@ -1,18 +1,21 @@
 import { memo, useMemo } from 'react'
-import { UsersIcon } from '../../components/Icons'
-import type { ChildSessionInfo } from '../../store'
+import { ReturnIcon, UsersIcon } from '../../components/Icons'
 import { useI18n } from '../../i18n'
+import type { ChildSessionInfo } from '../../store'
+
+export type SubagentInlineItem = ChildSessionInfo & {
+  relatedTask: string
+  relatedMessageId?: string
+  elapsedSeconds: number
+}
 
 interface SubagentListInlineProps {
-  items: Array<
-    ChildSessionInfo & {
-      relatedTask: string
-      relatedMessageId?: string
-      elapsedSeconds: number
-    }
-  >
+  items: SubagentInlineItem[]
   onOpenSession: (sessionId: string) => void
   onJumpToMessage: (messageId: string) => void
+  isInChildSession: boolean
+  onBackToParentSession: () => void
+  parentSessionTitle?: string
 }
 
 function formatClockTime(timestamp: number): string {
@@ -24,6 +27,9 @@ export const SubagentListInline = memo(function SubagentListInline({
   items,
   onOpenSession,
   onJumpToMessage,
+  isInChildSession,
+  onBackToParentSession,
+  parentSessionTitle,
 }: SubagentListInlineProps) {
   const { t } = useI18n()
 
@@ -44,16 +50,25 @@ export const SubagentListInline = memo(function SubagentListInline({
     [items, t],
   )
 
-  if (rows.length === 0) return null
+  if (rows.length === 0 && !isInChildSession) return null
 
   return (
-    <div className="mx-auto w-full max-w-[900px] px-4 mt-2">
-      <div className="rounded-lg border border-border-200/60 bg-bg-100/70 p-3">
+    <div className="h-full overflow-hidden border-l border-border-200/50 bg-bg-100/70">
+      <div className="h-full flex flex-col p-3">
+        {isInChildSession && (
+          <button
+            className="mb-3 inline-flex items-center gap-1.5 self-start px-2.5 py-1.5 text-xs rounded-md border border-border-200/60 text-text-300 hover:text-text-100 hover:bg-bg-200/60"
+            onClick={onBackToParentSession}
+          >
+            <ReturnIcon size={13} />
+            {parentSessionTitle ? `${t('backToParentSession')}: ${parentSessionTitle}` : t('backToParentSession')}
+          </button>
+        )}
         <div className="flex items-center gap-2 text-xs text-text-300 mb-2">
           <UsersIcon size={14} />
           <span className="font-medium">{t('subagents')}</span>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-y-auto custom-scrollbar pr-1">
           {rows.map(item => (
             <div key={item.id} className="rounded-md border border-border-200/50 bg-bg-050/60 px-2.5 py-2">
               <div className="flex items-center justify-between gap-2">

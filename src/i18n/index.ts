@@ -60,6 +60,7 @@ export type TranslationKey =
   | 'workingDirectory'
   | 'enterAbsolutePath'
   | 'backToDirectoryList'
+  | 'backToParentSession'
   | 'selectDirectory'
   | 'current'
   | 'enterCustomPath'
@@ -273,10 +274,71 @@ export type TranslationKey =
   | 'pathStyleWindows'
   | 'general'
   | 'terminal'
+  | 'enter'
+  | 'viewFullSession'
+  | 'loadingPanel'
+  | 'noContent'
+  | 'noActiveSession'
+  | 'createTerminal'
+  | 'restoringSessions'
+  | 'skills'
+  | 'refresh'
+  | 'filterSkills'
+  | 'loadingSkills'
+  | 'noSkillsFound'
+  | 'mcpServers'
+  | 'addServer'
+  | 'loadingServers'
+  | 'noMcpServersConfigured'
+  | 'newTerminal'
+  | 'hidePanel'
+  | 'failedLoadSkills'
+  | 'retry'
+  | 'failedLoadMcpServers'
+  | 'task'
+  | 'againToStop'
+  | 'failedLoadWorktrees'
+  | 'worktreeFailed'
+  | 'failedCreateWorktree'
+  | 'failedRemoveWorktree'
+  | 'failedResetWorktree'
+  | 'selectProjectToManageWorktrees'
+  | 'worktrees'
+  | 'createWorktree'
+  | 'loadingWorktrees'
+  | 'noWorktreesFound'
+  | 'removeWorktree'
+  | 'removeWorktreeConfirmPrefix'
+  | 'removeWorktreeConfirmSuffix'
+  | 'resetWorktree'
+  | 'resetWorktreeConfirmPrefix'
+  | 'resetWorktreeConfirmSuffix'
+  | 'reset'
+  | 'newWorktree'
+  | 'worktreeNamePlaceholder'
+  | 'openSessionAfterCreation'
+  | 'create'
+  | 'openSessionInWorktree'
   | 'using'
   | 'detected'
   | 'windows'
   | 'unix'
+  | 'serverNameRequired'
+  | 'commandRequired'
+  | 'failedAddServer'
+  | 'addMcpServer'
+  | 'local'
+  | 'remote'
+  | 'serverName'
+  | 'commandPlaceholder'
+  | 'adding'
+  | 'disabled'
+  | 'failed'
+  | 'needsAuth'
+  | 'needsRegistration'
+  | 'disconnect'
+  | 'connect'
+  | 'authenticate'
 
 type Translator = Record<TranslationKey, string>
 
@@ -338,6 +400,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     workingDirectory: 'Working Directory',
     enterAbsolutePath: 'Enter absolute path...',
     backToDirectoryList: '← Back to directory list',
+    backToParentSession: 'Back to parent session',
     selectDirectory: 'Select directory...',
     current: '(current)',
     enterCustomPath: 'Enter custom path...',
@@ -478,7 +541,6 @@ const dictionaries: Record<UILanguage, Translator> = {
     notRunning: 'Not running',
     start: 'Start',
     stop: 'Stop',
-    refresh: 'Refresh',
     environmentVariables: 'Environment Variables',
     envVarsDesc: 'Passed to the opencode serve process (e.g. HTTPS_PROXY, API keys)',
     desktopOnlyServiceDesc: 'This section is available on desktop app only',
@@ -553,10 +615,71 @@ const dictionaries: Record<UILanguage, Translator> = {
     pathStyleWindows: 'Win \\',
     general: 'General',
     terminal: 'Terminal',
+    enter: 'Enter',
+    viewFullSession: 'View full session',
+    loadingPanel: 'Loading panel...',
+    noContent: 'No content',
+    noActiveSession: 'No active session',
+    createTerminal: 'Create Terminal',
+    restoringSessions: 'Restoring sessions...',
+    skills: 'Skills',
+    refresh: 'Refresh',
+    filterSkills: 'Filter skills...',
+    loadingSkills: 'Loading skills...',
+    noSkillsFound: 'No skills found',
+    mcpServers: 'MCP Servers',
+    addServer: 'Add Server',
+    loadingServers: 'Loading servers...',
+    noMcpServersConfigured: 'No MCP servers configured',
+    newTerminal: 'New Terminal',
+    hidePanel: 'Hide Panel',
+    failedLoadSkills: 'Failed to load skills',
+    retry: 'Retry',
+    failedLoadMcpServers: 'Failed to load MCP servers',
+    task: 'Task',
+    againToStop: 'again to stop',
+    failedLoadWorktrees: 'Failed to load worktrees',
+    worktreeFailed: 'Worktree failed',
+    failedCreateWorktree: 'Failed to create worktree',
+    failedRemoveWorktree: 'Failed to remove worktree',
+    failedResetWorktree: 'Failed to reset worktree',
+    selectProjectToManageWorktrees: 'Select a project to manage worktrees',
+    worktrees: 'Worktrees',
+    createWorktree: 'Create Worktree',
+    loadingWorktrees: 'Loading worktrees...',
+    noWorktreesFound: 'No worktrees found',
+    removeWorktree: 'Remove Worktree',
+    removeWorktreeConfirmPrefix: 'Remove worktree',
+    removeWorktreeConfirmSuffix: 'This will delete the worktree directory.',
+    resetWorktree: 'Reset Worktree',
+    resetWorktreeConfirmPrefix: 'Reset worktree',
+    resetWorktreeConfirmSuffix: 'This will discard all uncommitted changes.',
+    reset: 'Reset',
+    newWorktree: 'New Worktree',
+    worktreeNamePlaceholder: 'Worktree name (e.g. feature-xyz)',
+    openSessionAfterCreation: 'Open session after creation',
+    create: 'Create',
+    openSessionInWorktree: 'Open session in this worktree',
     using: 'Using',
     detected: 'detected',
     windows: 'Windows',
     unix: 'Unix',
+    serverNameRequired: 'Server name is required',
+    commandRequired: 'Command is required',
+    failedAddServer: 'Failed to add server',
+    addMcpServer: 'Add MCP Server',
+    local: 'Local',
+    remote: 'Remote',
+    serverName: 'Server name',
+    commandPlaceholder: 'Command (e.g., npx -y @modelcontextprotocol/server-github)',
+    adding: 'Adding...',
+    disabled: 'Disabled',
+    failed: 'Failed',
+    needsAuth: 'Needs Auth',
+    needsRegistration: 'Needs Registration',
+    disconnect: 'Disconnect',
+    connect: 'Connect',
+    authenticate: 'Authenticate',
   },
   zh: {
     appName: 'OpenCodeUIPlus',
@@ -615,6 +738,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     workingDirectory: '工作目录',
     enterAbsolutePath: '输入绝对路径...',
     backToDirectoryList: '← 返回目录列表',
+    backToParentSession: '返回父会话',
     selectDirectory: '选择目录...',
     current: '（当前）',
     enterCustomPath: '输入自定义路径...',
@@ -755,7 +879,6 @@ const dictionaries: Record<UILanguage, Translator> = {
     notRunning: '未运行',
     start: '启动',
     stop: '停止',
-    refresh: '刷新',
     environmentVariables: '环境变量',
     envVarsDesc: '传递给 opencode serve 进程（如 HTTPS_PROXY、API key）',
     desktopOnlyServiceDesc: '该部分仅在桌面端可用',
@@ -828,10 +951,71 @@ const dictionaries: Record<UILanguage, Translator> = {
     pathStyleWindows: 'Win \\',
     general: '通用',
     terminal: '终端',
+    enter: '进入',
+    viewFullSession: '查看完整会话',
+    loadingPanel: '面板加载中...',
+    noContent: '暂无内容',
+    noActiveSession: '当前没有活跃会话',
+    createTerminal: '创建终端',
+    restoringSessions: '正在恢复会话...',
+    skills: '技能',
+    refresh: '刷新',
+    filterSkills: '筛选技能...',
+    loadingSkills: '技能加载中...',
+    noSkillsFound: '未找到技能',
+    mcpServers: 'MCP 服务',
+    addServer: '添加服务',
+    loadingServers: '服务加载中...',
+    noMcpServersConfigured: '尚未配置 MCP 服务',
+    newTerminal: '新建终端',
+    hidePanel: '隐藏面板',
+    failedLoadSkills: '加载技能失败',
+    retry: '重试',
+    failedLoadMcpServers: '加载 MCP 服务失败',
+    task: '任务',
+    againToStop: '再次按下以停止',
+    failedLoadWorktrees: '加载 worktree 失败',
+    worktreeFailed: 'worktree 执行失败',
+    failedCreateWorktree: '创建 worktree 失败',
+    failedRemoveWorktree: '移除 worktree 失败',
+    failedResetWorktree: '重置 worktree 失败',
+    selectProjectToManageWorktrees: '请先选择项目再管理 worktree',
+    worktrees: 'Worktree',
+    createWorktree: '创建 Worktree',
+    loadingWorktrees: '正在加载 worktree...',
+    noWorktreesFound: '未找到 worktree',
+    removeWorktree: '移除 Worktree',
+    removeWorktreeConfirmPrefix: '确认移除 worktree',
+    removeWorktreeConfirmSuffix: '该操作会删除对应 worktree 目录。',
+    resetWorktree: '重置 Worktree',
+    resetWorktreeConfirmPrefix: '确认重置 worktree',
+    resetWorktreeConfirmSuffix: '该操作会丢弃所有未提交修改。',
+    reset: '重置',
+    newWorktree: '新建 Worktree',
+    worktreeNamePlaceholder: 'Worktree 名称（如 feature-xyz）',
+    openSessionAfterCreation: '创建后进入会话',
+    create: '创建',
+    openSessionInWorktree: '在该 worktree 中打开会话',
     using: '使用',
     detected: '检测到',
     windows: 'Windows',
     unix: 'Unix',
+    serverNameRequired: '服务名称必填',
+    commandRequired: '命令必填',
+    failedAddServer: '添加服务失败',
+    addMcpServer: '添加 MCP 服务',
+    local: '本地',
+    remote: '远程',
+    serverName: '服务名称',
+    commandPlaceholder: '命令（例如：npx -y @modelcontextprotocol/server-github）',
+    adding: '添加中...',
+    disabled: '已禁用',
+    failed: '失败',
+    needsAuth: '需要认证',
+    needsRegistration: '需要注册',
+    disconnect: '断开连接',
+    connect: '连接',
+    authenticate: '认证',
   },
 }
 

@@ -74,6 +74,12 @@ interface SubagentListItem {
   elapsedSeconds: number
 }
 
+interface SubagentPanelContext {
+  isInChildSession: boolean
+  parentSessionId: string | null
+  parentSessionTitle?: string
+}
+
 export function useChatSession({ chatAreaRef, currentModel, refetchModels }: UseChatSessionOptions) {
   // Store State
   const {
@@ -581,6 +587,36 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     [navigateToSession],
   )
 
+  const subagentPanelContext = useMemo<SubagentPanelContext>(() => {
+    if (!routeSessionId) {
+      return {
+        isInChildSession: false,
+        parentSessionId: null,
+      }
+    }
+
+    const currentInfo = childSessionStore.getSessionInfo(routeSessionId)
+    if (!currentInfo) {
+      return {
+        isInChildSession: false,
+        parentSessionId: routeSessionId,
+      }
+    }
+
+    const parentTitle = sessions.find(session => session.id === currentInfo.parentID)?.title
+
+    return {
+      isInChildSession: true,
+      parentSessionId: currentInfo.parentID,
+      parentSessionTitle: parentTitle || `Session ${currentInfo.parentID.slice(0, 6)}`,
+    }
+  }, [routeSessionId, sessions])
+
+  const handleBackToParentSession = useCallback(() => {
+    if (!subagentPanelContext.parentSessionId) return
+    navigateToSession(subagentPanelContext.parentSessionId)
+  }, [navigateToSession, subagentPanelContext.parentSessionId])
+
   // New session
   const handleNewSession = useCallback(() => {
     navigateHome()
@@ -660,8 +696,16 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
   const subagentList = useMemo<SubagentListItem[]>(() => {
     if (!routeSessionId) return []
 
-    const children = childSessionStore.getChildSessions(routeSessionId)
-    const subtaskParts = messages
+    const listRootSessionId = subagentPanelContext.isInChildSession
+      ? subagentPanelContext.parentSessionId || routeSessionId
+      : routeSessionId
+    const children = childSessionStore.getChildSessions(listRootSessionId)
+    const sourceMessages =
+      listRootSessionId === routeSessionId
+        ? messages
+        : (messageStore.getSessionState(listRootSessionId)?.messages ?? [])
+
+    const subtaskParts = sourceMessages
       .filter(message => message.info.role === 'assistant')
       .flatMap(message =>
         message.parts
@@ -690,7 +734,13 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
         elapsedSeconds: Math.max(0, Math.floor((subagentTick - child.createdAt) / 1000)),
       }
     })
-  }, [messages, routeSessionId, subagentTick])
+  }, [
+    messages,
+    routeSessionId,
+    subagentTick,
+    subagentPanelContext.isInChildSession,
+    subagentPanelContext.parentSessionId,
+  ])
 
   return {
     // State
@@ -739,6 +789,7 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     handleRedoWithAnimation,
     handleSelectSession,
     handleOpenSessionById,
+    handleBackToParentSession,
     handleNewSession,
     handleVisibleMessageIdsChange,
     handleArchiveSession,
@@ -748,5 +799,6 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     handleCopyLastResponse,
     restoreAgentFromMessage,
     subagentList,
+    subagentPanelContext,
   }
 }

@@ -6,6 +6,7 @@ import { useDirectory } from '../hooks'
 import { createPtySession, removePtySession } from '../api/pty'
 import type { TerminalTab } from '../store/layoutStore'
 import { ResizablePanel } from './ui/ResizablePanel'
+import { useI18n } from '../i18n'
 
 const SessionChangesPanel = lazy(() =>
   import('./SessionChangesPanel').then(module => ({ default: module.SessionChangesPanel })),
@@ -17,10 +18,12 @@ const SkillPanel = lazy(() => import('./SkillPanel').then(module => ({ default: 
 const WorktreePanel = lazy(() => import('./WorktreePanel').then(module => ({ default: module.WorktreePanel })))
 
 function PanelFallback() {
-  return <div className="flex items-center justify-center h-full text-text-400 text-xs">Loading panel...</div>
+  const label = useI18n().t('loadingPanel')
+  return <div className="flex items-center justify-center h-full text-text-400 text-xs">{label}</div>
 }
 
 export const RightPanel = memo(function RightPanel() {
+  const { t } = useI18n()
   const { rightPanelOpen, rightPanelWidth, previewFile } = useLayoutStore()
   const { sessionId } = useMessageStore()
   const { currentDirectory } = useDirectory()
@@ -71,7 +74,7 @@ export const RightPanel = memo(function RightPanel() {
   const renderContent = useCallback(
     (activeTab: PanelTab | null) => {
       if (!activeTab) {
-        return <div className="flex items-center justify-center h-full text-text-400 text-xs">No content</div>
+        return <div className="flex items-center justify-center h-full text-text-400 text-xs">{t('noContent')}</div>
       }
 
       switch (activeTab.type) {
@@ -90,7 +93,9 @@ export const RightPanel = memo(function RightPanel() {
         case 'changes':
           if (!sessionId) {
             return (
-              <div className="flex items-center justify-center h-full text-text-400 text-xs">No active session</div>
+              <div className="flex items-center justify-center h-full text-text-400 text-xs">
+                {t('noActiveSession')}
+              </div>
             )
           }
           return (
@@ -126,7 +131,7 @@ export const RightPanel = memo(function RightPanel() {
           return null
       }
     },
-    [currentDirectory, previewFile, sessionId, isPanelResizing],
+    [currentDirectory, previewFile, sessionId, isPanelResizing, t],
   )
 
   return (

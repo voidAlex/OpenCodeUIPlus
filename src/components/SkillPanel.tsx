@@ -16,6 +16,7 @@ import {
 import { getSkills } from '../api/skill'
 import type { Skill } from '../types/api/skill'
 import { useDirectory } from '../hooks'
+import { useI18n } from '../i18n'
 
 // ============================================
 // SkillPanel Component
@@ -26,6 +27,7 @@ interface SkillPanelProps {
 }
 
 export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: SkillPanelProps) {
+  const { t } = useI18n()
   const { currentDirectory } = useDirectory()
   const [skills, setSkills] = useState<Skill[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,11 +42,11 @@ export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: 
       setSkills(data)
     } catch (err) {
       console.error('[SkillPanel] Failed to load skills:', err)
-      setError('Failed to load skills')
+      setError(t('failedLoadSkills'))
     } finally {
       setLoading(false)
     }
-  }, [currentDirectory])
+  }, [currentDirectory, t])
 
   useEffect(() => {
     loadSkills()
@@ -64,14 +66,14 @@ export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: 
         <div className="flex items-center justify-between px-3 py-2">
           <div className="flex items-center gap-2 text-text-100 text-sm font-medium">
             <TeachIcon size={14} />
-            <span>Skills</span>
+            <span>{t('skills')}</span>
             {!loading && <span className="text-text-400 text-xs">({skills.length})</span>}
           </div>
           <button
             onClick={loadSkills}
             disabled={loading}
             className="p-1 hover:bg-bg-200 rounded text-text-300 hover:text-text-100 transition-colors disabled:opacity-50"
-            title="Refresh"
+            title={t('refresh')}
           >
             <RetryIcon size={14} className={loading ? 'animate-spin' : ''} />
           </button>
@@ -84,7 +86,7 @@ export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: 
               type="text"
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              placeholder="Filter skills..."
+              placeholder={t('filterSkills')}
               className="w-full pl-8 pr-2 py-1 text-xs bg-bg-200/50 border border-transparent focus:border-border-200 rounded text-text-100 placeholder-text-400 focus:outline-none transition-colors"
             />
             <SearchIcon size={12} className="absolute left-2.5 top-1.5 text-text-400" />
@@ -97,7 +99,7 @@ export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: 
         {loading && skills.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
             <SpinnerIcon size={20} className="animate-spin opacity-50" />
-            <span>Loading skills...</span>
+            <span>{t('loadingSkills')}</span>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2">
@@ -107,13 +109,13 @@ export const SkillPanel = memo(function SkillPanel({ isResizing: _isResizing }: 
               onClick={loadSkills}
               className="px-3 py-1.5 text-xs bg-bg-200/50 hover:bg-bg-200 text-text-200 rounded-md transition-colors"
             >
-              Retry
+              {t('retry')}
             </button>
           </div>
         ) : filteredSkills.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-text-400 text-sm gap-2 px-4 text-center">
             <TeachIcon size={24} className="opacity-30" />
-            <span>No skills found</span>
+            <span>{t('noSkillsFound')}</span>
           </div>
         ) : (
           <div className="divide-y divide-border-100">
