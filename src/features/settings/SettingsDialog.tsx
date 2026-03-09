@@ -39,8 +39,9 @@ import { KeybindingsSection } from './KeybindingsSection'
 import type { ThemeMode } from '../../hooks'
 import type { PathMode } from '../../utils/directoryUtils'
 import type { ServerConfig, ServerHealth } from '../../store/serverStore'
+import { useI18n, type UILanguage } from '../../i18n'
 
-const APP_VERSION_LABEL = `OpenCodeUI v${__APP_VERSION__}`
+const APP_VERSION_LABEL = `OpenCodeUIPlus v${__APP_VERSION__}`
 
 // ============================================
 // Types
@@ -572,6 +573,7 @@ function AppearanceSettings({
 // ============================================
 
 function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' }) {
+  const { language, setLanguage, t } = useI18n()
   const { pathMode, setPathMode, effectiveStyle, detectedStyle, isAutoMode } = usePathMode()
   const { sidebarFolderRecents } = useLayoutStore()
   const [autoApprove, setAutoApprove] = useState(autoApproveStore.enabled)
@@ -634,7 +636,7 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
   }
 
   const handleTestNotification = () => {
-    sendNotification('OpenCode', 'This is a test notification')
+    sendNotification(t('appName'), 'This is a test notification')
   }
 
   const handleReasoningDisplayModeChange = (mode: ReasoningDisplayMode) => {
@@ -713,6 +715,17 @@ function GeneralSettings({ mode }: { mode: 'chat' | 'notifications' | 'service' 
     <div className="space-y-4">
       {mode === 'chat' && (
         <>
+          <SettingsCard title={t('language')} description="Switch UI language instantly and persist preference">
+            <SegmentedControl
+              value={language}
+              options={[
+                { value: 'zh', label: '中文', icon: <GlobeIcon size={14} /> },
+                { value: 'en', label: 'English', icon: <GlobeIcon size={14} /> },
+              ]}
+              onChange={v => setLanguage(v as UILanguage)}
+            />
+          </SettingsCard>
+
           <div className="grid gap-4 xl:grid-cols-2">
             <SettingsCard title="Paths & Formatting" description="How file paths are displayed in messages and tools">
               <SegmentedControl

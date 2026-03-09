@@ -25,3 +25,5 @@ export const STORAGE_KEY_LAST_DIRECTORY = 'last-directory'
 
 /** 浏览器通知开关 */
 export const STORAGE_KEY_NOTIFICATIONS_ENABLED = 'notifications-enabled'
+
+export const STORAGE_KEY_UI_LANGUAGE = 'ui-language'
