@@ -1261,6 +1261,7 @@ function InputBoxComponent({
 
                     {/* Bottom Bar -> InputToolbar */}
                     <InputToolbar
+                      sessionId={sessionId}
                       agents={agents}
                       selectedAgent={selectedAgent}
                       onAgentChange={onAgentChange}

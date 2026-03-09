@@ -303,3 +303,7 @@ export function useBusySessions(): ActiveSessionEntry[] {
 export function useBusyCount(): number {
   return useSyncExternalStore(activeSessionStore.subscribe, activeSessionStore.getBusyCountSnapshot)
 }
+
+export function useSessionStatusMap(): SessionStatusMap {
+  return useSyncExternalStore(activeSessionStore.subscribe, () => activeSessionStore.getSnapshot().statusMap)
+}

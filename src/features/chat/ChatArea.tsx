@@ -9,7 +9,6 @@ import { messageStore } from '../../store'
 import { SpinnerIcon } from '../../components/Icons'
 import type { Message } from '../../types/message'
 import { RetryStatusInline, type RetryStatusInlineData } from './RetryStatusInline'
-import { WaitingStatusInline, type WaitingStatusInlineData } from './WaitingStatusInline'
 import { buildVisibleMessageEntries } from './chatAreaVisibility'
 import {
   VIRTUOSO_START_INDEX,
@@ -58,7 +57,7 @@ export type ChatAreaHandle = {
   /** 滚动到指定索引的消息（用于目录导航） */
   scrollToMessageIndex: (index: number) => void
   /** 按消息 ID 滚动（避免渲染合并导致的索引漂移） */
-  scrollToMessageId: (messageId: string) => void
+  scrollToMessageId: (messageId: string) => boolean
 }
 
 // 大数字作为起始索引，允许向前 prepend
@@ -230,41 +229,6 @@ export const ChatArea = memo(
       // 过滤空消息 + 合并连续工具 assistant 消息
       const visibleMessageEntries = useMemo(() => buildVisibleMessageEntries(messages), [messages])
       const visibleMessages = useMemo(() => visibleMessageEntries.map(entry => entry.message), [visibleMessageEntries])
-
-      const waitingPhase = useMemo<WaitingStatusInlineData['phase'] | null>(() => {
-        if (retryStatus) return 'retry'
-        if (!isStreaming) return null
-
-        const lastAssistant = [...visibleMessages].reverse().find(message => message.info.role === 'assistant')
-        if (!lastAssistant) return 'queue'
-
-        const hasRunningTool = lastAssistant.parts.some(
-          part => part.type === 'tool' && (part.state.status === 'running' || part.state.status === 'pending'),
-        )
-        if (hasRunningTool) return 'tool'
-
-        const hasReasoning = lastAssistant.parts.some(part => part.type === 'reasoning' && part.text.trim().length > 0)
-        if (hasReasoning) return 'reasoning'
-
-        return 'queue'
-      }, [isStreaming, retryStatus, visibleMessages])
-
-      const [waitingSince, setWaitingSince] = useState<number | null>(null)
-      useEffect(() => {
-        if (waitingPhase) {
-          setWaitingSince(prev => prev ?? Date.now())
-        } else {
-          setWaitingSince(null)
-        }
-      }, [waitingPhase])
-
-      const waitingStatus = useMemo<WaitingStatusInlineData | null>(() => {
-        if (!waitingPhase || waitingSince === null) return null
-        return {
-          phase: waitingPhase,
-          since: waitingSince,
-        }
-      }, [waitingPhase, waitingSince])
 
       // 计算每个回合的总时长：user.created → 最后一条 assistant.completed
       // 只在回合最后一条 assistant 消息上标记
@@ -549,7 +513,7 @@ export const ChatArea = memo(
             const index = entries.findIndex(
               entry => entry.message.info.id === messageId || entry.sourceIds.includes(messageId),
             )
-            if (index < 0) return
+            if (index < 0) return false
 
             suppressScrollRef.current = true
             setTimeout(() => {
@@ -561,6 +525,7 @@ export const ChatArea = memo(
               align: 'start',
               behavior: 'smooth',
             })
+            return true
           },
         }),
         [scrollToIndexProgrammatically],
@@ -662,12 +627,11 @@ export const ChatArea = memo(
       // 但在 context 变化时会 re-render
       const virtuosoContext = useMemo(
         () => ({
-          waitingStatus: waitingStatus ?? null,
           retryStatus: retryStatus ?? null,
           bottomPadding,
           messageMaxWidthClass,
         }),
-        [waitingStatus, retryStatus, bottomPadding, messageMaxWidthClass],
+        [retryStatus, bottomPadding, messageMaxWidthClass],
       )
 
       // Virtuoso components 必须引用稳定，否则每次 render 都会 remount Footer/Header
@@ -676,15 +640,6 @@ export const ChatArea = memo(
           Header: VirtuosoHeader,
           Footer: ({ context }: { context: typeof virtuosoContext }) => (
             <>
-              {context.waitingStatus && (
-                <div className={`w-full ${context.messageMaxWidthClass} mx-auto px-4`}>
-                  <div className="flex justify-start">
-                    <div className="w-full min-w-0">
-                      <WaitingStatusInline status={context.waitingStatus} />
-                    </div>
-                  </div>
-                </div>
-              )}
               {context.retryStatus && (
                 <div className={`w-full ${context.messageMaxWidthClass} mx-auto px-4`}>
                   <div className="flex justify-start">

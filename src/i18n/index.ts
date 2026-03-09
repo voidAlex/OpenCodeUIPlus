@@ -339,6 +339,8 @@ export type TranslationKey =
   | 'disconnect'
   | 'connect'
   | 'authenticate'
+  | 'waitingRetryingShort'
+  | 'waitingAiRespondingShort'
 
 type Translator = Record<TranslationKey, string>
 
@@ -680,6 +682,8 @@ const dictionaries: Record<UILanguage, Translator> = {
     disconnect: 'Disconnect',
     connect: 'Connect',
     authenticate: 'Authenticate',
+    waitingRetryingShort: 'Retrying…',
+    waitingAiRespondingShort: 'AI is responding…',
   },
   zh: {
     appName: 'OpenCodeUIPlus',
@@ -1016,6 +1020,8 @@ const dictionaries: Record<UILanguage, Translator> = {
     disconnect: '断开连接',
     connect: '连接',
     authenticate: '认证',
+    waitingRetryingShort: '重试中…',
+    waitingAiRespondingShort: 'AI 回复中…',
   },
 }
 

@@ -1,14 +1,24 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
-import { ChevronDownIcon, SendIcon, StopIcon, PaperclipIcon, AgentIcon, ThinkingIcon } from '../../../components/Icons'
+import {
+  ChevronDownIcon,
+  SendIcon,
+  StopIcon,
+  PaperclipIcon,
+  AgentIcon,
+  ThinkingIcon,
+  SpinnerIcon,
+} from '../../../components/Icons'
 import { DropdownMenu, MenuItem, IconButton, AnimatedPresence } from '../../../components/ui'
 import { InputToolbarModelSelector } from '../ModelSelector'
 import { useIsMobile } from '../../../hooks'
 import { isTauri, isTauriMobile, extToMime } from '../../../utils/tauri'
+import { useSessionStatusMap } from '../../../store/activeSessionStore'
 import type { ApiAgent } from '../../../api/client'
 import type { ModelInfo, FileCapabilities } from '../../../api'
 import { useI18n } from '../../../i18n'
 
 interface InputToolbarProps {
+  sessionId?: string | null
   agents: ApiAgent[]
   selectedAgent?: string
   onAgentChange?: (agentName: string) => void
@@ -37,6 +47,7 @@ interface InputToolbarProps {
 }
 
 export function InputToolbar({
+  sessionId,
   agents,
   selectedAgent,
   onAgentChange,
@@ -57,6 +68,7 @@ export function InputToolbar({
   inputContainerRef,
 }: InputToolbarProps) {
   const { t } = useI18n()
+  const statusMap = useSessionStatusMap()
   const isMobile = useIsMobile()
   const useBrowserFileInput = !isTauri() || isTauriMobile()
 
@@ -175,6 +187,17 @@ export function InputToolbar({
 
   const selectableAgents = agents.filter(a => a.mode !== 'subagent' && !a.hidden)
   const currentAgent = agents.find(a => a.name === selectedAgent)
+
+  const compactWaiting = useMemo(() => {
+    if (!sessionId) return null
+    const status = statusMap[sessionId]
+    if (!status) return null
+
+    if (status.type === 'retry') {
+      return t('waitingRetryingShort')
+    }
+    return isStreaming ? t('waitingAiRespondingShort') : null
+  }, [isStreaming, sessionId, statusMap, t])
 
   return (
     <div className="flex items-center justify-between px-3 pb-3 relative">
@@ -308,6 +331,16 @@ export function InputToolbar({
 
       {/* Action Buttons */}
       <div className="flex items-center gap-1">
+        {compactWaiting && (
+          <div
+            className="hidden sm:flex items-center gap-1 px-2 h-8 rounded-md border border-border-200/40 bg-bg-200/45 text-[11px] text-text-300"
+            role="status"
+            aria-live="polite"
+          >
+            <SpinnerIcon size={12} className="animate-spin text-info-100" />
+            <span>{compactWaiting}</span>
+          </div>
+        )}
         <AnimatedPresence show={supportsAnyFile}>
           <>
             {/* 浏览器模式下的隐藏文件输入 */}

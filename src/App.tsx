@@ -280,10 +280,23 @@ function App() {
     if (!subagentPanelContext.parentSessionId) return
     if (routeSessionId !== subagentPanelContext.parentSessionId) return
 
-    const timer = window.setTimeout(() => {
-      chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
-      setPendingSubagentJumpMessageId(null)
-    }, 120)
+    let attempts = 0
+    const maxAttempts = 8
+    const run = () => {
+      const ok = chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
+      if (ok) {
+        setPendingSubagentJumpMessageId(null)
+        return
+      }
+      attempts += 1
+      if (attempts >= maxAttempts) {
+        setPendingSubagentJumpMessageId(null)
+        return
+      }
+      timer = window.setTimeout(run, 120)
+    }
+
+    let timer = window.setTimeout(run, 80)
 
     return () => window.clearTimeout(timer)
   }, [pendingSubagentJumpMessageId, routeSessionId, subagentPanelContext.parentSessionId])
