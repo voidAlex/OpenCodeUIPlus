@@ -5,6 +5,7 @@ import {
   PermissionDialog,
   QuestionDialog,
   Sidebar,
+  SubagentListInline,
   ChatArea,
   type ChatAreaHandle,
 } from './features/chat'
@@ -227,6 +228,7 @@ function App() {
     selectedAgent,
     setSelectedAgent,
     routeSessionId,
+    subagentList,
     loadState,
     hasMoreHistory,
     retryStatus,
@@ -258,6 +260,7 @@ function App() {
     handleUndoWithAnimation,
     handleRedoWithAnimation,
     handleSelectSession,
+    handleOpenSessionById,
     handleNewSession,
     handleVisibleMessageIdsChange,
     handleArchiveSession,
@@ -783,6 +786,15 @@ function App() {
                       fullAutoHint
                     )}
                   </div>
+                </div>
+              )}
+              {subagentList.length > 0 && (
+                <div className="pointer-events-auto">
+                  <SubagentListInline
+                    items={subagentList}
+                    onOpenSession={handleOpenSessionById}
+                    onJumpToMessage={messageId => chatAreaRef.current?.scrollToMessageId(messageId)}
+                  />
                 </div>
               )}
               <InputBox

@@ -9,6 +9,7 @@ import { messageStore } from '../../store'
 import { SpinnerIcon } from '../../components/Icons'
 import type { Message } from '../../types/message'
 import { RetryStatusInline, type RetryStatusInlineData } from './RetryStatusInline'
+import { WaitingStatusInline, type WaitingStatusInlineData } from './WaitingStatusInline'
 import { buildVisibleMessageEntries } from './chatAreaVisibility'
 import {
   VIRTUOSO_START_INDEX,
@@ -20,6 +21,7 @@ import {
   MESSAGE_PREFETCH_BUFFER,
 } from '../../constants'
 import { useIsMobile } from '../../hooks'
+import { useI18n } from '../../i18n'
 
 interface ChatAreaProps {
   messages: Message[]
@@ -87,6 +89,7 @@ export const ChatArea = memo(
       },
       ref,
     ) => {
+      const { t } = useI18n()
       const virtuosoRef = useRef<VirtuosoHandle>(null)
       const isMobile = useIsMobile()
       // 移动端输入框收起/展开会导致 ~80px 高度差，加大阈值防止 isAtBottom 抖动
@@ -227,6 +230,41 @@ export const ChatArea = memo(
       // 过滤空消息 + 合并连续工具 assistant 消息
       const visibleMessageEntries = useMemo(() => buildVisibleMessageEntries(messages), [messages])
       const visibleMessages = useMemo(() => visibleMessageEntries.map(entry => entry.message), [visibleMessageEntries])
+
+      const waitingPhase = useMemo<WaitingStatusInlineData['phase'] | null>(() => {
+        if (retryStatus) return 'retry'
+        if (!isStreaming) return null
+
+        const lastAssistant = [...visibleMessages].reverse().find(message => message.info.role === 'assistant')
+        if (!lastAssistant) return 'queue'
+
+        const hasRunningTool = lastAssistant.parts.some(
+          part => part.type === 'tool' && (part.state.status === 'running' || part.state.status === 'pending'),
+        )
+        if (hasRunningTool) return 'tool'
+
+        const hasReasoning = lastAssistant.parts.some(part => part.type === 'reasoning' && part.text.trim().length > 0)
+        if (hasReasoning) return 'reasoning'
+
+        return 'queue'
+      }, [isStreaming, retryStatus, visibleMessages])
+
+      const [waitingSince, setWaitingSince] = useState<number | null>(null)
+      useEffect(() => {
+        if (waitingPhase) {
+          setWaitingSince(prev => prev ?? Date.now())
+        } else {
+          setWaitingSince(null)
+        }
+      }, [waitingPhase])
+
+      const waitingStatus = useMemo<WaitingStatusInlineData | null>(() => {
+        if (!waitingPhase || waitingSince === null) return null
+        return {
+          phase: waitingPhase,
+          since: waitingSince,
+        }
+      }, [waitingPhase, waitingSince])
 
       // 计算每个回合的总时长：user.created → 最后一条 assistant.completed
       // 只在回合最后一条 assistant 消息上标记
@@ -621,11 +659,12 @@ export const ChatArea = memo(
       // 但在 context 变化时会 re-render
       const virtuosoContext = useMemo(
         () => ({
+          waitingStatus: waitingStatus ?? null,
           retryStatus: retryStatus ?? null,
           bottomPadding,
           messageMaxWidthClass,
         }),
-        [retryStatus, bottomPadding, messageMaxWidthClass],
+        [waitingStatus, retryStatus, bottomPadding, messageMaxWidthClass],
       )
 
       // Virtuoso components 必须引用稳定，否则每次 render 都会 remount Footer/Header
@@ -634,6 +673,15 @@ export const ChatArea = memo(
           Header: VirtuosoHeader,
           Footer: ({ context }: { context: typeof virtuosoContext }) => (
             <>
+              {context.waitingStatus && (
+                <div className={`w-full ${context.messageMaxWidthClass} mx-auto px-4`}>
+                  <div className="flex justify-start">
+                    <div className="w-full min-w-0">
+                      <WaitingStatusInline status={context.waitingStatus} />
+                    </div>
+                  </div>
+                </div>
+              )}
               {context.retryStatus && (
                 <div className={`w-full ${context.messageMaxWidthClass} mx-auto px-4`}>
                   <div className="flex justify-start">
@@ -661,7 +709,7 @@ export const ChatArea = memo(
             <div className="absolute inset-0 z-10 flex items-center justify-center">
               <div className="flex flex-col items-center gap-3 text-text-400 animate-in fade-in duration-300">
                 <SpinnerIcon size={24} className="animate-spin" />
-                <span className="text-sm">Loading session...</span>
+                <span className="text-sm">{t('loadingSession')}</span>
               </div>
             </div>
           )}
@@ -670,14 +718,14 @@ export const ChatArea = memo(
             <div className="absolute top-24 left-0 right-0 z-10 flex justify-center pointer-events-none">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg-100/90 border border-border-200 shadow-sm text-text-400 animate-in fade-in slide-in-from-top-2 duration-200">
                 <SpinnerIcon size={14} className="animate-spin" />
-                <span className="text-xs">Loading...</span>
+                <span className="text-xs">{t('loading')}</span>
               </div>
             </div>
           )}
           {!isLoadingMore && showNoMoreHint && isNearTop && (
             <div className="absolute top-24 left-0 right-0 z-10 flex justify-center pointer-events-none">
               <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-bg-100/90 border border-border-200 shadow-sm text-text-400 animate-in fade-in slide-in-from-top-2 duration-200">
-                <span className="text-xs">No more history</span>
+                <span className="text-xs">{t('noMoreHistory')}</span>
               </div>
             </div>
           )}
