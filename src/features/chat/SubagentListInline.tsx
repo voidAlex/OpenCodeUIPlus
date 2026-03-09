@@ -15,6 +15,11 @@ interface SubagentListInlineProps {
   onJumpToMessage: (messageId: string) => void
 }
 
+function formatClockTime(timestamp: number): string {
+  const date = new Date(timestamp)
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:${String(date.getSeconds()).padStart(2, '0')}`
+}
+
 export const SubagentListInline = memo(function SubagentListInline({
   items,
   onOpenSession,
@@ -77,6 +82,9 @@ export const SubagentListInline = memo(function SubagentListInline({
               </div>
               <div className="text-[11px] text-text-400 mt-1 truncate">
                 {t('relatedTask', { task: item.relatedTask })}
+              </div>
+              <div className="text-[11px] text-text-500 mt-0.5 truncate">
+                {t('startedAt', { time: formatClockTime(item.createdAt) })}
               </div>
             </div>
           ))}

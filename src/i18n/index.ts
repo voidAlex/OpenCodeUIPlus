@@ -18,6 +18,7 @@ type TranslationKey =
   | 'subagentDone'
   | 'subagentError'
   | 'relatedTask'
+  | 'startedAt'
   | 'jumpToMessage'
   | 'openSession'
   | 'language'
@@ -53,6 +54,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     subagentDone: 'Done',
     subagentError: 'Error',
     relatedTask: 'Task: {task}',
+    startedAt: 'Started at {time}',
     jumpToMessage: 'Jump to message',
     openSession: 'Open session',
     language: 'Language',
@@ -85,6 +87,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     subagentDone: '完成',
     subagentError: '异常',
     relatedTask: '关联任务：{task}',
+    startedAt: '开始时间：{time}',
     jumpToMessage: '定位消息',
     openSession: '进入会话',
     language: '界面语言',
