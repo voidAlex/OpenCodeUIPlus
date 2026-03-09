@@ -6,6 +6,7 @@ import { useIsMobile } from '../../../hooks'
 import { isTauri, isTauriMobile, extToMime } from '../../../utils/tauri'
 import type { ApiAgent } from '../../../api/client'
 import type { ModelInfo, FileCapabilities } from '../../../api'
+import { useI18n } from '../../../i18n'
 
 interface InputToolbarProps {
   agents: ApiAgent[]
@@ -55,6 +56,7 @@ export function InputToolbar({
   modelsLoading = false,
   inputContainerRef,
 }: InputToolbarProps) {
+  const { t } = useI18n()
   const isMobile = useIsMobile()
   const useBrowserFileInput = !isTauri() || isTauriMobile()
 
@@ -322,18 +324,18 @@ export function InputToolbar({
                 }}
               />
             )}
-            <IconButton aria-label="Attach file" disabled={controlsDisabled} onClick={handleFileClick}>
+            <IconButton aria-label={t('attachFile')} disabled={controlsDisabled} onClick={handleFileClick}>
               <PaperclipIcon />
             </IconButton>
           </>
         </AnimatedPresence>
         {!canSend && isStreaming && !isSending ? (
-          <IconButton aria-label="Stop generation" variant="solid" onClick={onAbort}>
+          <IconButton aria-label={t('stopGeneration')} variant="solid" onClick={onAbort}>
             <StopIcon />
           </IconButton>
         ) : (
           <IconButton
-            aria-label={isSending ? 'Sending message' : 'Send message'}
+            aria-label={isSending ? t('sendingMessage') : t('sendMessage')}
             variant="solid"
             disabled={!canSend || isSending}
             onClick={onSend}

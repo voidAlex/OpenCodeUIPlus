@@ -438,7 +438,7 @@ export function SidePanel({
               projectsExpanded ? 'bg-bg-200 text-text-100' : 'text-text-300 hover:text-text-100 hover:bg-bg-200'
             }`}
             style={{ paddingLeft: 6, paddingRight: 6 }}
-            title={currentProject?.name || 'Global'}
+            title={currentProject?.name || t('globalProject')}
           >
             <span className="size-5 flex items-center justify-center shrink-0">
               {currentProject?.id === 'global' ? (
@@ -447,7 +447,7 @@ export function SidePanel({
                 <FolderIcon size={16} />
               )}
             </span>
-            <span className="ml-2 text-sm truncate">{currentProject?.name || 'Global'}</span>
+            <span className="ml-2 text-sm truncate">{currentProject?.name || t('globalProject')}</span>
             <ChevronDownIcon
               size={14}
               className={`ml-auto text-text-400 transition-transform duration-200 shrink-0 ${projectsExpanded ? '' : '-rotate-90'}`}
@@ -504,7 +504,7 @@ export function SidePanel({
                           setProjectDeleteConfirm({ isOpen: true, projectId: project.id })
                         }}
                         className="p-1 rounded text-text-400 hover:text-danger-100 hover:bg-danger-100/10 md:opacity-0 md:group-hover:opacity-100 transition-all"
-                        title="Remove"
+                        title={t('remove')}
                       >
                         <TrashIcon size={12} />
                       </button>
@@ -519,7 +519,7 @@ export function SidePanel({
                 className="w-full flex items-center gap-2 px-2 py-1.5 rounded text-xs text-text-400 hover:text-text-100 hover:bg-bg-200/50 transition-colors"
               >
                 <PlusIcon size={14} />
-                Add project...
+                {t('addProject')}
               </button>
             </div>
           </div>
@@ -542,14 +542,14 @@ export function SidePanel({
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search chats..."
+              placeholder={t('searchChats')}
               className="w-full bg-bg-200/40 hover:bg-bg-200/60 focus:bg-bg-000 border border-transparent focus:border-border-200 rounded-lg py-1.5 pl-8 pr-8 text-xs text-text-100 placeholder:text-text-400/70 focus:outline-none transition-all"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-text-400 hover:text-text-100 text-sm"
-                aria-label="Clear search"
+                aria-label={t('clearSearch')}
               >
                 ×
               </button>
@@ -566,7 +566,7 @@ export function SidePanel({
                 sidebarTab === 'recents' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
               }`}
             >
-              Recents
+              {t('recents')}
             </button>
             <button
               onClick={() => setSidebarTab('active')}
@@ -574,7 +574,7 @@ export function SidePanel({
                 sidebarTab === 'active' ? 'text-text-100' : 'text-text-500 hover:text-text-300'
               }`}
             >
-              Active
+              {t('active')}
               {attentionCount > 0 && (
                 <span
                   className={`inline-flex items-center justify-center min-w-[16px] h-4 px-1 text-[10px] font-bold rounded-full ${
@@ -631,7 +631,7 @@ export function SidePanel({
             <div className="flex-1 overflow-y-auto custom-scrollbar px-2 py-2">
               {busySessions.length === 0 && notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-text-400 opacity-60">
-                  <p className="text-xs">No active sessions</p>
+                  <p className="text-xs">{t('noActiveSessions')}</p>
                 </div>
               ) : (
                 <div className="space-y-0.5">
@@ -655,7 +655,7 @@ export function SidePanel({
                       className={`flex items-center justify-between gap-2 ${busySessions.length > 0 ? 'mt-2 pt-2 border-t border-border-200/30' : ''}`}
                     >
                       <span className="text-[10px] font-medium text-text-400 uppercase tracking-wider pl-1">
-                        Notifications
+                        {t('notifications')}
                       </span>
                       <div className="flex items-center gap-0.5">
                         {notifications.some((n: NotificationEntry) => !n.read) && (
@@ -663,14 +663,14 @@ export function SidePanel({
                             className="text-[10px] text-text-400 hover:text-text-200 px-1.5 py-0.5 rounded-md hover:bg-bg-200 transition-all duration-150 active:scale-95"
                             onClick={() => notificationStore.markAllRead()}
                           >
-                            Read all
+                            {t('readAll')}
                           </button>
                         )}
                         <button
                           className="text-[10px] text-text-400 hover:text-text-200 px-1.5 py-0.5 rounded-md hover:bg-bg-200 transition-all duration-150 active:scale-95"
                           onClick={() => notificationStore.clearAll()}
                         >
-                          Clear
+                          {t('clear')}
                         </button>
                       </div>
                     </div>
@@ -721,9 +721,9 @@ export function SidePanel({
           }
           setProjectDeleteConfirm({ isOpen: false, projectId: null })
         }}
-        title="Remove Project"
-        description="Remove this project folder from the list? Files won't be deleted."
-        confirmText="Remove"
+        title={t('removeProject')}
+        description={t('removeProjectConfirm')}
+        confirmText={t('remove')}
         variant="danger"
       />
     </div>
@@ -833,9 +833,9 @@ import { CheckIcon, AlertCircleIcon, CloseIcon, HandIcon, QuestionIcon } from '.
 
 function formatNotificationTime(ts: number): string {
   const diff = Date.now() - ts
-  if (diff < 60_000) return 'just now'
-  if (diff < 3600_000) return `${Math.floor(diff / 60_000)}m ago`
-  return `${Math.floor(diff / 3600_000)}h ago`
+  if (diff < 60_000) return '0m'
+  if (diff < 3600_000) return `${Math.floor(diff / 60_000)}m`
+  return `${Math.floor(diff / 3600_000)}h`
 }
 
 const notifTypeConfig = {
@@ -852,6 +852,7 @@ interface NotificationItemProps {
 }
 
 function NotificationItem({ entry, resolvedSession, onSelect }: NotificationItemProps) {
+  const { t } = useI18n()
   const displayTitle = resolvedSession?.title || entry.title || entry.sessionId.slice(0, 12) + '...'
   const directory = resolvedSession?.directory || entry.directory
 
@@ -915,7 +916,7 @@ function NotificationItem({ entry, resolvedSession, onSelect }: NotificationItem
         <button
           className="p-0.5 rounded-md text-text-400 opacity-0 group-hover:opacity-100 hover:text-text-200 hover:bg-bg-200 transition-all duration-150 active:scale-90"
           onClick={handleDismiss}
-          aria-label="Dismiss"
+          aria-label={t('dismiss')}
         >
           <CloseIcon size={10} />
         </button>
@@ -1003,6 +1004,7 @@ function SidebarFooter({
   isWideMode,
   onToggleWideMode,
 }: SidebarFooterProps) {
+  const { t } = useI18n()
   const [isOpen, setIsOpen] = useState(false)
   const [menuPos, setMenuPos] = useState({ top: 0, left: 0, width: 260, fromBottom: false })
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
@@ -1219,7 +1221,7 @@ function SidebarFooter({
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-text-300 hover:text-text-100 hover:bg-bg-200/50 transition-colors text-left"
               >
                 {isWideMode ? <MinimizeIcon size={14} /> : <MaximizeIcon size={14} />}
-                <span>{isWideMode ? 'Standard Width' : 'Wide Mode'}</span>
+                <span>{isWideMode ? t('standardWidth') : t('wideMode')}</span>
               </button>
             )}
 
@@ -1231,7 +1233,7 @@ function SidebarFooter({
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-text-300 hover:text-text-100 hover:bg-bg-200/50 transition-colors text-left"
             >
               <ShareIcon size={14} />
-              <span>Share Chat</span>
+              <span>{t('shareChat')}</span>
             </button>
 
             <button
@@ -1242,7 +1244,7 @@ function SidebarFooter({
               className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-text-300 hover:text-text-100 hover:bg-bg-200/50 transition-colors text-left"
             >
               <CogIcon size={14} />
-              <span>Settings</span>
+              <span>{t('settings')}</span>
             </button>
           </div>
 

@@ -3,6 +3,7 @@ import { PermissionListIcon, UsersIcon, ReturnIcon, ChevronDownIcon } from '../.
 import { DiffView } from '../../components/DiffView'
 import { ContentBlock } from '../../components'
 import { childSessionStore, autoApproveStore } from '../../store'
+import { useI18n } from '../../i18n'
 
 interface PermissionDialogProps {
   request: ApiPermissionRequest
@@ -25,6 +26,7 @@ export function PermissionDialog({
   collapsed = false,
   onCollapsedChange,
 }: PermissionDialogProps) {
+  const { t } = useI18n()
   // 从 metadata 中提取 diff 信息
   const metadata = request.metadata
   const diff = metadata?.diff as string | undefined
@@ -66,15 +68,19 @@ export function PermissionDialog({
                 <div className="flex items-center justify-center text-text-100 w-5 h-5">
                   <PermissionListIcon size={20} />
                 </div>
-                <h3 className="text-sm font-medium text-text-100">Permission: {request.permission}</h3>
+                <h3 className="text-sm font-medium text-text-100">
+                  {t('permissionTitle', { permission: request.permission })}
+                </h3>
                 {queueLength > 1 && (
-                  <span className="text-xs text-text-400 bg-bg-200 px-1.5 py-0.5 rounded">+{queueLength - 1} more</span>
+                  <span className="text-xs text-text-400 bg-bg-200 px-1.5 py-0.5 rounded">
+                    {t('moreCount', { count: queueLength - 1 })}
+                  </span>
                 )}
               </div>
               <button
                 onClick={() => onCollapsedChange?.(true)}
                 className="p-1 rounded-md text-text-400 hover:text-text-200 hover:bg-bg-200 transition-colors"
-                title="Minimize"
+                title={t('minimize')}
               >
                 <ChevronDownIcon size={16} />
               </button>
@@ -84,7 +90,9 @@ export function PermissionDialog({
             {isFromChildSession && (
               <div className="px-4 pb-2 flex items-center gap-2">
                 <UsersIcon className="w-3.5 h-3.5 text-info-100" />
-                <span className="text-xs text-info-100">From subtask: {childSessionInfo?.title || 'Subtask'}</span>
+                <span className="text-xs text-info-100">
+                  {t('fromSubtask', { title: childSessionInfo?.title || t('subtask') })}
+                </span>
               </div>
             )}
 
@@ -95,7 +103,7 @@ export function PermissionDialog({
               {/* Diff Preview for file edits */}
               {isFileEdit && diff && (
                 <div>
-                  <p className="text-xs text-text-400 mb-2">Changes preview</p>
+                  <p className="text-xs text-text-400 mb-2">{t('changesPreview')}</p>
                   <DiffView
                     diff={diff}
                     before={before}
@@ -110,7 +118,7 @@ export function PermissionDialog({
               {/* Patterns */}
               {request.patterns && request.patterns.length > 0 && (
                 <ContentBlock
-                  label="Requesting"
+                  label={t('requesting')}
                   content={request.patterns.map(p => p.replace(/\\n/g, '\n')).join('\n\n')}
                   language="bash"
                   maxHeight={200}
@@ -121,7 +129,7 @@ export function PermissionDialog({
               {/* Already allowed */}
               {request.always && request.always.length > 0 && (
                 <ContentBlock
-                  label="Allowed"
+                  label={t('allowed')}
                   content={request.always.join('\n')}
                   language="bash"
                   maxHeight={80}
@@ -138,7 +146,7 @@ export function PermissionDialog({
                 disabled={isReplying}
                 className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-text-100 text-bg-000 hover:bg-text-200 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>{isReplying ? 'Sending...' : 'Allow once'}</span>
+                <span>{isReplying ? t('sending') : t('allowOnce')}</span>
                 {!isReplying && <ReturnIcon />}
               </button>
 
@@ -163,9 +171,9 @@ export function PermissionDialog({
                 disabled={isReplying}
                 className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg border border-border-200/50 text-text-100 hover:bg-bg-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Always allow</span>
+                <span>{t('alwaysAllow')}</span>
                 <span className="text-xs text-text-400">
-                  {autoApproveStore.enabled ? 'Browser session' : 'This session'}
+                  {autoApproveStore.enabled ? t('browserSession') : t('thisSession')}
                 </span>
               </button>
 
@@ -175,14 +183,12 @@ export function PermissionDialog({
                 disabled={isReplying}
                 className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg text-text-300 hover:bg-bg-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Reject</span>
+                <span>{t('reject')}</span>
                 <span className="text-xs text-text-500">Esc</span>
               </button>
 
               <p className="text-[11px] text-text-500 pt-1 px-1 leading-relaxed">
-                {autoApproveStore.enabled
-                  ? 'Auto-approve enabled. Refresh browser to reset permissions.'
-                  : 'You can change permission settings at any time.'}
+                {autoApproveStore.enabled ? t('autoApproveEnabledHint') : t('permissionSettingsHint')}
               </p>
             </div>
           </div>

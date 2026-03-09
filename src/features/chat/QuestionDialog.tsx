@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import { QuestionIcon, CheckIcon, ReturnIcon, ChevronDownIcon } from '../../components/Icons'
 import type { ApiQuestionRequest, ApiQuestionInfo, QuestionAnswer } from '../../api'
+import { useI18n } from '../../i18n'
 
 interface QuestionDialogProps {
   request: ApiQuestionRequest
@@ -21,6 +22,7 @@ export function QuestionDialog({
   collapsed = false,
   onCollapsedChange,
 }: QuestionDialogProps) {
+  const { t } = useI18n()
   // 每个问题选中的选项 labels
   const [answers, setAnswers] = useState<Map<number, Set<string>>>(() => {
     const map = new Map<number, Set<string>>()
@@ -160,15 +162,17 @@ export function QuestionDialog({
                 <div className="flex items-center justify-center text-text-100 w-5 h-5">
                   <QuestionIcon />
                 </div>
-                <h3 className="text-sm font-medium text-text-100">Question</h3>
+                <h3 className="text-sm font-medium text-text-100">{t('question')}</h3>
                 {queueLength > 1 && (
-                  <span className="text-xs text-text-400 bg-bg-200 px-1.5 py-0.5 rounded">+{queueLength - 1} more</span>
+                  <span className="text-xs text-text-400 bg-bg-200 px-1.5 py-0.5 rounded">
+                    {t('moreCount', { count: queueLength - 1 })}
+                  </span>
                 )}
               </div>
               <button
                 onClick={() => onCollapsedChange?.(true)}
                 className="p-1 rounded-md text-text-400 hover:text-text-200 hover:bg-bg-200 transition-colors"
-                title="Minimize"
+                title={t('minimize')}
               >
                 <ChevronDownIcon size={16} />
               </button>
@@ -201,7 +205,7 @@ export function QuestionDialog({
                 disabled={!canSubmit || isReplying}
                 className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg bg-text-100 text-bg-000 hover:bg-text-200 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>{isReplying ? 'Sending...' : 'Submit'}</span>
+                <span>{isReplying ? t('sending') : t('submit')}</span>
                 {!isReplying && <ReturnIcon />}
               </button>
 
@@ -210,7 +214,7 @@ export function QuestionDialog({
                 disabled={isReplying}
                 className="w-full flex items-center justify-between px-3.5 py-2 rounded-lg text-text-300 hover:bg-bg-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Skip</span>
+                <span>{t('skip')}</span>
                 <span className="text-xs text-text-500">Esc</span>
               </button>
             </div>
@@ -245,6 +249,7 @@ function QuestionItem({
   onToggleCustom,
   onCustomValueChange,
 }: QuestionItemProps) {
+  const { t } = useI18n()
   const isMultiple = question.multiple || false
   const allowCustom = question.custom !== false
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -329,7 +334,7 @@ function QuestionItem({
                   else onSelectCustom()
                 }
               }}
-              placeholder="Type your own answer..."
+              placeholder={t('typeYourOwnAnswer')}
               rows={1}
               className="flex-1 bg-transparent text-sm text-text-100 placeholder:text-text-500 focus:outline-none resize-none min-h-[20px]"
             />

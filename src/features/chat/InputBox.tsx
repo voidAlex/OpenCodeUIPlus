@@ -21,6 +21,7 @@ import { extToMime } from '../../utils/tauri'
 import type { ApiAgent } from '../../api/client'
 import type { ModelInfo, FileCapabilities } from '../../api'
 import type { Command } from '../../api/command'
+import { useI18n } from '../../i18n'
 
 // ============================================
 // Types
@@ -156,6 +157,7 @@ function InputBoxComponent({
   const dragCounterRef = useRef(0)
 
   // 响应式 placeholder
+  const { t } = useI18n()
   const isMobile = useIsMobile()
 
   // Refs
@@ -1117,7 +1119,7 @@ function InputBoxComponent({
                   type="button"
                   onClick={onScrollToBottom}
                   className="h-[32px] w-[32px] min-w-[32px] rounded-full bg-accent-main-100/10 border border-accent-main-100/20 backdrop-blur-md flex items-center justify-center text-accent-main-000 hover:bg-accent-main-100/20 transition-colors shrink-0"
-                  aria-label="Scroll to bottom"
+                  aria-label={t('scrollToBottom')}
                 >
                   <ArrowDownIcon size={16} />
                 </button>
@@ -1134,14 +1136,14 @@ function InputBoxComponent({
                 className="flex items-center gap-1.5 px-3 h-[32px] rounded-full bg-bg-000/95 backdrop-blur-md border border-border-200/50 shadow-lg shadow-black/5 text-text-300 hover:text-text-200 hover:bg-bg-000 active:scale-95 transition-all"
               >
                 <ArrowUpIcon size={14} />
-                <span className="text-[11px]">Reply...</span>
+                <span className="text-[11px]">{t('reply')}</span>
               </button>
               {showScrollToBottom && (
                 <button
                   type="button"
                   onClick={onScrollToBottom}
                   className="h-[32px] w-[32px] min-w-[32px] rounded-full bg-accent-main-100/10 border border-accent-main-100/20 backdrop-blur-md flex items-center justify-center text-accent-main-000 hover:bg-accent-main-100/20 transition-colors shrink-0"
-                  aria-label="Scroll to bottom"
+                  aria-label={t('scrollToBottom')}
                 >
                   <ArrowDownIcon size={16} />
                 </button>
@@ -1168,7 +1170,7 @@ function InputBoxComponent({
                 {/* Drop overlay */}
                 {isDragging && (
                   <div className="absolute inset-0 z-50 rounded-2xl bg-accent-main-100/5 backdrop-blur-[1px] flex items-center justify-center pointer-events-none">
-                    <span className="text-sm text-accent-main-100 font-medium">Drop files here</span>
+                    <span className="text-sm text-accent-main-100 font-medium">{t('dropFilesHere')}</span>
                   </div>
                 )}
                 {/* @ Mention Menu */}
