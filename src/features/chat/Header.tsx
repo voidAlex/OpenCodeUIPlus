@@ -9,6 +9,7 @@ import { useSessionContext } from '../../contexts/useSessionContext'
 import { updateSession } from '../../api'
 import { uiErrorHandler } from '../../utils'
 import type { ModelInfo } from '../../api'
+import { useI18n } from '../../i18n'
 
 interface HeaderProps {
   models: ModelInfo[]
@@ -27,6 +28,7 @@ export function Header({
   onOpenSidebar,
   modelSelectorRef,
 }: HeaderProps) {
+  const { t } = useI18n()
   const { sessionId } = useMessageStore()
   const { rightPanelOpen, bottomPanelOpen } = useLayoutStore()
   const { sessions, refresh } = useSessionContext()
@@ -41,17 +43,17 @@ export function Header({
   const currentSession = useMemo(() => sessions.find(s => s.id === sessionId), [sessions, sessionId])
   const sessionTitle = currentSession?.title || 'New Chat'
 
-  // 同步 document.title - 有 session 标题时显示 "标题 - OpenCode"，否则只显示 "OpenCode"
   useEffect(() => {
+    const appName = t('appName')
     if (currentSession?.title) {
-      document.title = `${currentSession.title} - OpenCode`
+      document.title = `${currentSession.title} - ${appName}`
     } else {
-      document.title = 'OpenCode'
+      document.title = appName
     }
     return () => {
-      document.title = 'OpenCode'
+      document.title = appName
     }
-  }, [currentSession?.title])
+  }, [currentSession?.title, t])
 
   // Editing Logic
   useEffect(() => {
@@ -93,7 +95,7 @@ export function Header({
         {/* Mobile Sidebar Toggle - 只在移动端显示 */}
         {onOpenSidebar && (
           <IconButton
-            aria-label="Open sidebar"
+            aria-label={t('openSidebar')}
             onClick={onOpenSidebar}
             className="md:hidden hover:bg-bg-200/50 text-text-400 hover:text-text-100 -ml-2"
           >
@@ -132,7 +134,7 @@ export function Header({
               <button
                 onClick={handleStartEdit}
                 className="px-2 py-1.5 text-sm font-medium text-text-200 hover:text-text-100 transition-colors truncate max-w-[200px] cursor-text select-none"
-                title="Click to rename"
+                title={t('clickToRename')}
               >
                 {sessionTitle}
               </button>
@@ -142,7 +144,7 @@ export function Header({
                 <div className="w-[1.5px] h-3 bg-border-200/50 mx-0.5 shrink-0" />
                 <button
                   className="p-1 text-text-400 hover:text-text-100 transition-colors rounded-md hover:bg-bg-300/50 shrink-0"
-                  title="Share session"
+                  title={t('shareSession')}
                   onClick={() => setShareDialogOpen(true)}
                 >
                   <ChevronDownIcon size={12} />
@@ -175,7 +177,7 @@ export function Header({
             <button
               onClick={handleStartEdit}
               className="px-3 py-1.5 text-sm font-medium text-text-200 hover:text-text-100 transition-colors truncate max-w-[300px] cursor-text select-none text-center"
-              title="Click to rename"
+              title={t('clickToRename')}
             >
               {sessionTitle}
             </button>
@@ -186,7 +188,7 @@ export function Header({
               <div className="w-[1.5px] h-3 bg-border-200/50 mx-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
               <button
                 className="p-1 text-text-400 hover:text-text-100 transition-colors rounded-md hover:bg-bg-300/50 opacity-0 group-hover:opacity-100 shrink-0"
-                title="Share session"
+                title={t('shareSession')}
                 onClick={() => setShareDialogOpen(true)}
               >
                 <ChevronDownIcon size={12} />

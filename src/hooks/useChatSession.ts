@@ -2,7 +2,7 @@
 // useChatSession - 聊天会话管理
 // ============================================
 
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
 import {
   useMessageStore,
   messageStore,
@@ -43,6 +43,8 @@ import { clipboardErrorHandler, copyTextToClipboard, createErrorHandler, isSameD
 import { serverStorage } from '../utils/perServerStorage'
 import { UNDO_SCROLL_DELAY_MS, AUTO_SCROLL_SUPPRESS_DURATION_MS, STORAGE_KEY_SELECTED_AGENT } from '../constants'
 import type { ChatAreaHandle } from '../features/chat'
+import { t } from '../i18n'
+import type { SubtaskPart } from '../types/message'
 
 const handleError = createErrorHandler('session')
 
@@ -57,6 +59,19 @@ interface LiveRetryStatus {
   attempt: number
   message: string
   next: number
+}
+
+interface SubagentListItem {
+  id: string
+  parentID: string
+  title: string
+  agent?: string
+  status: 'running' | 'idle' | 'error'
+  createdAt: number
+  relatedTask: string
+  relatedMessageId?: string
+  relatedDescription: string
+  elapsedSeconds: number
 }
 
 export function useChatSession({ chatAreaRef, currentModel, refetchModels }: UseChatSessionOptions) {
@@ -95,6 +110,8 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
   const { sendNotification } = useNotification()
 
   const routeStatus = routeSessionId ? statusMap[routeSessionId] : undefined
+  const [subagentTick, setSubagentTick] = useState(() => Date.now())
+  const subagentTickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // OpenAPI SessionStatus.retry: { attempt, message, next }
   const retryStatus = useMemo<LiveRetryStatus | null>(() => {
@@ -107,12 +124,33 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     }
   }, [routeSessionId, routeStatus])
 
+  useEffect(() => {
+    if (!routeSessionId) {
+      if (subagentTickTimerRef.current) {
+        clearInterval(subagentTickTimerRef.current)
+        subagentTickTimerRef.current = null
+      }
+      return
+    }
+
+    subagentTickTimerRef.current = setInterval(() => {
+      setSubagentTick(tick => tick + 1000)
+    }, 1000)
+
+    return () => {
+      if (subagentTickTimerRef.current) {
+        clearInterval(subagentTickTimerRef.current)
+        subagentTickTimerRef.current = null
+      }
+    }
+  }, [routeSessionId])
+
   const getSessionTitle = useCallback(
     (sessionId?: string) => {
       const session = sessions.find(s => s.id === sessionId)
       if (session?.title) return session.title
       if (sessionId) return `Session ${sessionId.slice(0, 6)}`
-      return 'OpenCode'
+      return t('appName')
     },
     [sessions],
   )
@@ -536,6 +574,13 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     [navigateToSession],
   )
 
+  const handleOpenSessionById = useCallback(
+    (sessionId: string) => {
+      navigateToSession(sessionId)
+    },
+    [navigateToSession],
+  )
+
   // New session
   const handleNewSession = useCallback(() => {
     navigateHome()
@@ -612,6 +657,41 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     }
   }, [messages])
 
+  const subagentList = useMemo<SubagentListItem[]>(() => {
+    if (!routeSessionId) return []
+
+    const children = childSessionStore.getChildSessions(routeSessionId)
+    const subtaskParts = messages
+      .filter(message => message.info.role === 'assistant')
+      .flatMap(message =>
+        message.parts
+          .filter((part): part is SubtaskPart => part.type === 'subtask')
+          .map(part => ({
+            id: part.id,
+            messageID: part.messageID,
+            agent: part.agent,
+            description: part.description,
+          })),
+      )
+
+    return children.map(child => {
+      const related = [...subtaskParts].reverse().find(part => part.agent === child.agent) ??
+        subtaskParts[subtaskParts.length - 1] ?? {
+          id: child.id,
+          agent: child.agent || child.title,
+          description: child.title,
+        }
+
+      return {
+        ...child,
+        relatedTask: related.description || related.id,
+        relatedMessageId: related.messageID,
+        relatedDescription: related.description,
+        elapsedSeconds: Math.max(0, Math.floor((subagentTick - child.createdAt) / 1000)),
+      }
+    })
+  }, [messages, routeSessionId, subagentTick])
+
   return {
     // State
     messages,
@@ -658,6 +738,7 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     handleUndoWithAnimation,
     handleRedoWithAnimation,
     handleSelectSession,
+    handleOpenSessionById,
     handleNewSession,
     handleVisibleMessageIdsChange,
     handleArchiveSession,
@@ -666,5 +747,6 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     handleToggleAgent,
     handleCopyLastResponse,
     restoreAgentFromMessage,
+    subagentList,
   }
 }

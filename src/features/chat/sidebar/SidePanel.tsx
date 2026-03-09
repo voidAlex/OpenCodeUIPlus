@@ -39,6 +39,7 @@ import {
 import { isSameDirectory } from '../../../utils'
 import { uiErrorHandler } from '../../../utils'
 import type { SessionStats } from '../../../hooks'
+import { useI18n } from '../../../i18n'
 
 // 获取路径的父目录部分（用于显示项目位置）
 function getParentPath(fullPath: string): string {
@@ -99,6 +100,7 @@ export function SidePanel({
   isWideMode,
   onToggleWideMode,
 }: SidePanelProps) {
+  const { t } = useI18n()
   const {
     currentDirectory,
     savedDirectories,
@@ -379,7 +381,7 @@ export function SidePanel({
           }}
         >
           <a href="/" className="flex items-center whitespace-nowrap">
-            <span className="text-base font-semibold text-text-100 tracking-tight">OpenCode</span>
+            <span className="text-base font-semibold text-text-100 tracking-tight">{t('appName')}</span>
           </a>
         </div>
 
@@ -409,7 +411,7 @@ export function SidePanel({
             paddingLeft: 6,
             paddingRight: 6,
           }}
-          title="New chat"
+          title={t('newChat')}
         >
           <span className="size-5 flex items-center justify-center shrink-0">
             <PlusIcon size={16} />
@@ -418,7 +420,7 @@ export function SidePanel({
             className="ml-2 text-sm whitespace-nowrap transition-opacity duration-300"
             style={{ opacity: showLabels ? 1 : 0 }}
           >
-            New chat
+            {t('newChat')}
           </span>
           <span
             className="ml-auto text-[10px] text-text-500 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap"

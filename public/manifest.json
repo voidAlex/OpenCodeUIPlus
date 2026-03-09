@@ -1,6 +1,6 @@
 {
-  "name": "OpenCode",
-  "short_name": "OpenCode",
+  "name": "OpenCodeUIPlus",
+  "short_name": "OpenCodeUIPlus",
   "description": "AI Coding Assistant",
   "start_url": "/",
   "display": "standalone",
