@@ -53,7 +53,7 @@ function App() {
   // Cancel Hint (double-Esc to abort)
   // ============================================
   const [showCancelHint, setShowCancelHint] = useState(false)
-  const [pendingSubagentJumpMessageId, setPendingSubagentJumpMessageId] = useState<string | null>(null)
+
 
   // ============================================
   // Full Auto Hint
@@ -275,34 +275,7 @@ function App() {
     restoreAgentFromMessage,
   } = useChatSession({ chatAreaRef, currentModel, refetchModels })
 
-  useEffect(() => {
-    if (!pendingSubagentJumpMessageId) return
-    if (!subagentPanelContext.parentSessionId) return
-    if (routeSessionId !== subagentPanelContext.parentSessionId) return
 
-    // 当路由切换到父会话且消息加载完成后，执行滚动
-    if (loadState === 'loaded') {
-      const ok = chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
-      if (ok) {
-        setPendingSubagentJumpMessageId(null)
-      } else {
-        // 如果 loaded 状态下还没找到，可能是 virtualized list 还没把 sourceIds 合并进去，容错重试几次
-        let attempts = 0
-        const maxAttempts = 10
-        const run = () => {
-          const success = chatAreaRef.current?.scrollToMessageId(pendingSubagentJumpMessageId)
-          if (success || attempts >= maxAttempts) {
-            setPendingSubagentJumpMessageId(null)
-            return
-          }
-          attempts++
-          timer = window.setTimeout(run, 150)
-        }
-        let timer = window.setTimeout(run, 100)
-        return () => window.clearTimeout(timer)
-      }
-    }
-  }, [pendingSubagentJumpMessageId, routeSessionId, subagentPanelContext.parentSessionId, loadState])
 
   // 赋值 ref（需在 useChatSession 之后，因为 handleVisibleMessageIdsChange 来自该 hook）
   handleVisibleMessageIdsChangeRef.current = handleVisibleMessageIdsChange
@@ -920,15 +893,7 @@ function App() {
             <SubagentListInline
               items={subagentList}
               onOpenSession={handleOpenSessionById}
-              onJumpToMessage={messageId => {
-                if (!messageId) return
-                if (subagentPanelContext.isInChildSession) {
-                  setPendingSubagentJumpMessageId(messageId)
-                  handleBackToParentSession()
-                  return
-                }
-                chatAreaRef.current?.scrollToMessageId(messageId)
-              }}
+
               isInChildSession={subagentPanelContext.isInChildSession}
               onBackToParentSession={handleBackToParentSession}
               parentSessionTitle={subagentPanelContext.parentSessionTitle}

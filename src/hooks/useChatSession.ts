@@ -2,7 +2,7 @@
 // useChatSession - 聊天会话管理
 // ============================================
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react'
+import { useState, useCallback, useEffect, useMemo } from 'react'
 import {
   useMessageStore,
   messageStore,
@@ -70,9 +70,7 @@ interface SubagentListItem {
   createdAt: number
   endedAt?: number
   relatedTask: string
-  relatedMessageId?: string
   relatedDescription: string
-  elapsedSeconds: number
 }
 
 interface SubagentPanelContext {
@@ -117,8 +115,6 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
   const { sendNotification } = useNotification()
 
   const routeStatus = routeSessionId ? statusMap[routeSessionId] : undefined
-  const [subagentTick, setSubagentTick] = useState(() => Date.now())
-  const subagentTickTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   // OpenAPI SessionStatus.retry: { attempt, message, next }
   const retryStatus = useMemo<LiveRetryStatus | null>(() => {
@@ -131,26 +127,7 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
     }
   }, [routeSessionId, routeStatus])
 
-  useEffect(() => {
-    if (!routeSessionId) {
-      if (subagentTickTimerRef.current) {
-        clearInterval(subagentTickTimerRef.current)
-        subagentTickTimerRef.current = null
-      }
-      return
-    }
 
-    subagentTickTimerRef.current = setInterval(() => {
-      setSubagentTick(tick => tick + 1000)
-    }, 1000)
-
-    return () => {
-      if (subagentTickTimerRef.current) {
-        clearInterval(subagentTickTimerRef.current)
-        subagentTickTimerRef.current = null
-      }
-    }
-  }, [routeSessionId])
 
   const getSessionTitle = useCallback(
     (sessionId?: string) => {
@@ -735,27 +712,12 @@ export function useChatSession({ chatAreaRef, currentModel, refetchModels }: Use
         ...child,
         status: authoritativeStatus,
         relatedTask: related.description || related.id,
-        relatedMessageId: related.messageID,
         relatedDescription: related.description,
-        // 当状态为 completed 或 error 时冻结计时，优先用 store 里的 endedAt，否则用最后一条消息的时间或当前固定时间
-        elapsedSeconds: Math.max(
-          0,
-          Math.floor(
-            ((authoritativeStatus === 'completed' || authoritativeStatus === 'error'
-              ? child.endedAt ?? subagentTick
-              : subagentTick) -
-              child.createdAt) /
-              1000,
-          ),
-        ),
       }
     })
   }, [
     messages,
     routeSessionId,
-    subagentTick,
-    subagentPanelContext.isInChildSession,
-    subagentPanelContext.parentSessionId,
     subagentPanelContext.isInChildSession,
     subagentPanelContext.parentSessionId,
   ])

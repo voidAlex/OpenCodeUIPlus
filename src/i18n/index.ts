@@ -19,7 +19,7 @@ export type TranslationKey =
   | 'subagentError'
   | 'relatedTask'
   | 'startedAt'
-  | 'jumpToMessage'
+
   | 'openSession'
   | 'language'
   | 'newChat'
@@ -361,7 +361,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     subagentError: 'Error',
     relatedTask: 'Task: {task}',
     startedAt: 'Started at {time}',
-    jumpToMessage: 'Jump to message',
+
     openSession: 'Open session',
     language: 'Language',
     newChat: 'New chat',
@@ -701,7 +701,7 @@ const dictionaries: Record<UILanguage, Translator> = {
     subagentError: '异常',
     relatedTask: '关联任务：{task}',
     startedAt: '开始时间：{time}',
-    jumpToMessage: '定位消息',
+
     openSession: '进入会话',
     language: '界面语言',
     newChat: '新建会话',

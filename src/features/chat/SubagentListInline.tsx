@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react'
+import { memo } from 'react'
 import { ReturnIcon, UsersIcon } from '../../components/Icons'
 import { useI18n } from '../../i18n'
 import type { ChildSessionInfo } from '../../store'
@@ -6,14 +6,11 @@ import type { ChildSessionInfo } from '../../store'
 export type SubagentInlineItem = Omit<ChildSessionInfo, 'status'> & {
   status: 'running' | 'idle' | 'error' | 'pending' | 'completed'
   relatedTask: string
-  relatedMessageId?: string
-  elapsedSeconds: number
 }
 
 interface SubagentListInlineProps {
   items: SubagentInlineItem[]
   onOpenSession: (sessionId: string) => void
-  onJumpToMessage: (messageId: string | undefined) => void
   isInChildSession: boolean
   onBackToParentSession: () => void
   parentSessionTitle?: string
@@ -27,32 +24,13 @@ function formatClockTime(timestamp: number): string {
 export const SubagentListInline = memo(function SubagentListInline({
   items,
   onOpenSession,
-  onJumpToMessage,
   isInChildSession,
   onBackToParentSession,
   parentSessionTitle,
 }: SubagentListInlineProps) {
   const { t } = useI18n()
 
-  const rows = useMemo(
-    () =>
-      items.map(item => {
-        const s = item.status
-        const statusText =
-          s === 'running' || s === 'pending'
-            ? t('subagentRunning')
-            : s === 'idle' || s === 'completed'
-              ? t('subagentDone')
-              : t('subagentError')
-        return {
-          ...item,
-          statusText,
-        }
-      }),
-    [items, t],
-  )
-
-  if (rows.length === 0 && !isInChildSession) return null
+  if (items.length === 0 && !isInChildSession) return null
 
   return (
     <div className="h-full overflow-hidden border-l border-border-200/50 bg-bg-100/70">
@@ -71,25 +49,15 @@ export const SubagentListInline = memo(function SubagentListInline({
           <span className="font-medium">{t('subagents')}</span>
         </div>
         <div className="space-y-2 overflow-y-auto custom-scrollbar pr-1">
-          {rows.map(item => (
+          {items.map(item => (
             <div key={item.id} className="rounded-md border border-border-200/50 bg-bg-050/60 px-2.5 py-2">
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
                   <div className="text-sm text-text-100 truncate">
                     {item.agent || item.title || item.id.slice(0, 8)}
                   </div>
-                  <div className="text-[11px] text-text-400 mt-0.5 truncate">
-                    {item.statusText} · {item.elapsedSeconds}s
-                  </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    className="px-2 py-1 text-[11px] rounded border border-border-200/60 hover:bg-bg-200/60 text-text-300"
-                    onClick={() => onJumpToMessage(item.relatedMessageId)}
-                    disabled={!item.relatedMessageId}
-                  >
-                    {t('jumpToMessage')}
-                  </button>
                   <button
                     className="px-2 py-1 text-[11px] rounded border border-border-200/60 hover:bg-bg-200/60 text-text-300"
                     onClick={() => onOpenSession(item.id)}
